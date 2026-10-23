@@ -37,3 +37,12 @@ export async function cancelarTurno(id) {
   });
   return data;
 }
+
+export async function obtenerTurnos() {
+  if (USE_MOCKS) {
+    await esperar();
+    return [...turnos];
+  }
+  const { data } = await apiTurnos.get('/appointments');
+  return data;
+}

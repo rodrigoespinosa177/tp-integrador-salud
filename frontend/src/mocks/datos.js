@@ -29,6 +29,17 @@ export const usuarios = [
     phone: '2613333333',
     birthdate: '2000-11-02',
   },
+
+  {
+    _id: 'u4',
+    first_name: 'Lucía',
+    last_name: 'Gómez',
+    email: 'lucia@test.com',
+    password: '123456',
+    rol: 'patient',
+    phone: '2614444444',
+    birthdate: '1995-07-19',
+  },
 ];
 
 // Simula la demora de un servidor real
@@ -51,6 +62,16 @@ export const turnos = [
     hour: '11:00',
     status: 'completed',
     motive: 'Dolor de cabeza',
+    assigned_by_id: 'u1',
+  },
+
+  {
+    _id: 't3',
+    patient_id: 'u4',
+    date: '2026-10-28',
+    hour: '10:00',
+    status: 'confirmed',
+    motive: 'Fiebre y tos',
     assigned_by_id: 'u1',
   },
 ];
