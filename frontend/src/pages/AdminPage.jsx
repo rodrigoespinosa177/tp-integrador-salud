@@ -1,3 +1,30 @@
+import { useState } from 'react';
+import UsuariosAdmin from './admin/UsuariosAdmin';
+
 export default function AdminPage() {
-  return <h1>Panel de administración</h1>;
+  const [pestania, setPestania] = useState('usuarios');
+
+  return (
+    <section>
+      <h1>Panel de administración</h1>
+
+      <nav>
+        <button
+          onClick={() => setPestania('usuarios')}
+          disabled={pestania === 'usuarios'}
+        >
+          Usuarios
+        </button>
+        <button
+          onClick={() => setPestania('turnos')}
+          disabled={pestania === 'turnos'}
+        >
+          Turnos
+        </button>
+      </nav>
+
+      {pestania === 'usuarios' && <UsuariosAdmin />}
+      {pestania === 'turnos' && <p>Próximamente.</p>}
+    </section>
+  );
 }
