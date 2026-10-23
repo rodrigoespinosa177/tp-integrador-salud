@@ -1,11 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
-const ETIQUETA_ROL = {
-  patient: 'Paciente',
-  nurse: 'Enfermero/a',
-  administrator: 'Administrador',
-};
+import { ETIQUETA_ROL } from '../utils/usuarios';
 
 export default function Layout() {
   const { user, logout } = useAuth();
