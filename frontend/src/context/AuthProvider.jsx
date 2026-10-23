@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { AuthContext } from './AuthContext';
 import { login as loginApi } from '../api/auth.api';
+import { RUTA_POR_ROL } from '../routes/rutasPorRol';
 
 function leerUsuarioGuardado() {
   try {
     const guardado = localStorage.getItem('user');
-    return guardado ? JSON.parse(guardado) : null;
+    const user = guardado ? JSON.parse(guardado) : null;
+    // Si el usuario guardado no tiene un rol válido, lo ignoramos
+    if (!user || !RUTA_POR_ROL[user.rol]) return null;
+    return user;
   } catch {
     return null;
   }
