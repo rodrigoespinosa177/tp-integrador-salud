@@ -25,17 +25,7 @@ export async function crearTurno(datos) {
 }
 
 export async function cancelarTurno(id) {
-  if (USE_MOCKS) {
-    await esperar();
-    const turno = turnos.find((t) => t._id === id);
-    if (!turno) throw new Error('Turno no encontrado');
-    turno.status = 'cancelled';
-    return { ...turno };
-  }
-  const { data } = await apiTurnos.patch(`/appointments/${id}`, {
-    status: 'cancelled',
-  });
-  return data;
+  return actualizarTurno(id, { status: 'cancelled' });
 }
 
 export async function obtenerTurnos() {
@@ -45,4 +35,27 @@ export async function obtenerTurnos() {
   }
   const { data } = await apiTurnos.get('/appointments');
   return data;
+}
+
+export async function actualizarTurno(id, cambios) {
+  if (USE_MOCKS) {
+    await esperar();
+    const turno = turnos.find((t) => t._id === id);
+    if (!turno) throw new Error('Turno no encontrado');
+    Object.assign(turno, cambios);
+    return { ...turno };
+  }
+  const { data } = await apiTurnos.patch(`/appointments/${id}`, cambios);
+  return data;
+}
+
+export async function eliminarTurno(id) {
+  if (USE_MOCKS) {
+    await esperar();
+    const indice = turnos.findIndex((t) => t._id === id);
+    if (indice === -1) throw new Error('Turno no encontrado');
+    turnos.splice(indice, 1);
+    return;
+  }
+  await apiTurnos.delete(`/appointments/${id}`);
 }
