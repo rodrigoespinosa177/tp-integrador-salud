@@ -9,19 +9,23 @@ export default function Layout() {
 
   return (
     <div>
-      <header>
-        <nav>
-          <NavLink to={RUTA_POR_ROL[user.rol]}>Inicio</NavLink>
-          {tienePerfil && <NavLink to="/perfil">Mi perfil</NavLink>}
-        </nav>
+      <header className="encabezado">
+        <div className="encabezado-contenido">
+          <nav className="menu">
+            <NavLink to={RUTA_POR_ROL[user.rol]}>Inicio</NavLink>
+            {tienePerfil && <NavLink to="/perfil">Mi perfil</NavLink>}
+          </nav>
 
-        <span>
-          {user.first_name} {user.last_name} · {ETIQUETA_ROL[user.rol]}
-        </span>
-        <button onClick={logout}>Cerrar sesión</button>
+          <span className="usuario">
+            {user.first_name} {user.last_name} · {ETIQUETA_ROL[user.rol]}
+          </span>
+          <button className="secundario" onClick={logout}>
+            Cerrar sesión
+          </button>
+        </div>
       </header>
 
-      <main>
+      <main className="contenido">
         <Outlet />
       </main>
     </div>

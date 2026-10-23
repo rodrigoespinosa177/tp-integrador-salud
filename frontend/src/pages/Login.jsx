@@ -27,34 +27,36 @@ export default function Login() {
   if (user) return <Navigate to={RUTA_POR_ROL[user.rol]} replace />;
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Iniciar sesión</h1>
+    <div className="login-pagina">
+      <form className="login" onSubmit={handleSubmit}>
+        <h1>Iniciar sesión</h1>
 
-      <label>
-        Email
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </label>
+        <label>
+          Email
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </label>
 
-      <label>
-        Contraseña
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </label>
+        <label>
+          Contraseña
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </label>
 
-      {error && <p role="alert">{error}</p>}
+        {error && <p role="alert">{error}</p>}
 
-      <button type="submit" disabled={cargando}>
-        {cargando ? 'Ingresando...' : 'Ingresar'}
-      </button>
-    </form>
+        <button type="submit" disabled={cargando}>
+          {cargando ? 'Ingresando...' : 'Ingresar'}
+        </button>
+      </form>
+    </div>
   );
 }
