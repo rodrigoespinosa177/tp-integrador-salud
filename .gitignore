@@ -1,0 +1,98 @@
+# ==========================
+# Dependencias
+# ==========================
+node_modules/
+*/node_modules/
+jspm_packages/
+
+# ==========================
+# Variables de entorno
+# ==========================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*/.env
+*/.env.local
+!.env.example
+!*/.env.example
+
+# ==========================
+# Build / dist (NestJS y React)
+# ==========================
+dist/
+build/
+*/dist/
+*/build/
+out/
+.next/
+.nuxt/
+
+# ==========================
+# Logs
+# ==========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==========================
+# Testing / cobertura
+# ==========================
+coverage/
+*/coverage/
+.nyc_output/
+
+# ==========================
+# Cachés
+# ==========================
+.cache/
+.eslintcache
+.parcel-cache/
+.vite/
+.turbo/
+
+# ==========================
+# TypeScript
+# ==========================
+*.tsbuildinfo
+
+# ==========================
+# Editor / IDE
+# ==========================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ==========================
+# Sistema operativo
+# ==========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ==========================
+# Docker
+# ==========================
+docker-compose.override.yml
+*.pid
+
+# ==========================
+# MongoDB (datos locales)
+# ==========================
+data/db/
+mongo-data/
+
+# ==========================
+# Archivos temporales
+# ==========================
+*.tmp
+*.temp
+.history/
