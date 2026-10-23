@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import UsuariosAdmin from './admin/UsuariosAdmin';
+import TurnosAdmin from './admin/TurnosAdmin';
 
 export default function AdminPage() {
   const [pestania, setPestania] = useState('usuarios');
@@ -24,7 +25,7 @@ export default function AdminPage() {
       </nav>
 
       {pestania === 'usuarios' && <UsuariosAdmin />}
-      {pestania === 'turnos' && <p>Próximamente.</p>}
+      {pestania === 'turnos' && <TurnosAdmin />}
     </section>
   );
 }
