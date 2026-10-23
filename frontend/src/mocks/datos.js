@@ -78,3 +78,15 @@ export const turnos = [
 
 // Genera un ID único para lo que se crea con los mocks
 export const nuevoId = (prefijo) => `${prefijo}${Date.now()}`;
+
+export const signos = [
+  {
+    _id: 's1',
+    medical_appointment_id: 't2',
+    nurse_id: 'u2',
+    date: '2026-10-15T11:10:00',
+    vital_signs: 'PA 120/80 · T 36.8 °C · FC 76 · SpO2 98%',
+    symptoms: 'Cefalea frontal desde hace 2 días',
+    observations: 'Se indica hidratación y control',
+  },
+];
