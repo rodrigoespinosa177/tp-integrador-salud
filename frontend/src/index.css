@@ -1,19 +1,48 @@
-/* ===== Variables de diseño ===== */
+/* =========================================================
+   Paleta inspirada en los colores de uniformes sanitarios
+   ========================================================= */
 :root {
-  --color-primario: #0f766e;
-  --color-primario-hover: #115e59;
-  --color-primario-suave: #ccfbf1;
-  --color-fondo: #f4f7f8;
-  --color-superficie: #ffffff;
-  --color-borde: #dbe3e6;
-  --color-texto: #1f2a30;
-  --color-texto-suave: #5b6b73;
-  --color-peligro: #b42318;
-  --color-peligro-suave: #fee4e2;
-  --color-exito: #067647;
-  --color-exito-suave: #dcfae6;
-  --radio: 10px;
-  --sombra: 0 1px 3px rgba(16, 24, 40, 0.08);
+  /* Azul: color principal */
+  --azul: #1f6fb2;
+  --azul-hover: #185a91;
+  --azul-suave: #e4f1fb;
+
+  /* Verde: éxito, atendido */
+  --verde: #2e8b57;
+  --verde-suave: #e3f4ea;
+
+  /* Amarillo: pendiente */
+  --amarillo: #f4c430;
+  --amarillo-texto: #8a6100;
+  --amarillo-suave: #fff6d6;
+
+  /* Rosa: acento decorativo */
+  --rosa: #e88aa8;
+
+  /* Rojo: errores y acciones peligrosas */
+  --rojo: #d92d20;
+  --rojo-hover: #fbd5d1;
+  --rojo-suave: #fde8e6;
+
+  /* Neutros */
+  --fondo: #f3f7fa;
+  --superficie: #ffffff;
+  --borde: #d9e3ea;
+  --texto: #1b2a36;
+  --texto-suave: #5a6b78;
+
+  --radio: 12px;
+  --sombra: 0 1px 2px rgba(16, 24, 40, 0.05), 0 2px 8px rgba(16, 24, 40, 0.06);
+
+  /* Franja con los 5 colores */
+  --franja: linear-gradient(
+    90deg,
+    var(--azul) 0 20%,
+    var(--verde) 20% 40%,
+    var(--amarillo) 40% 60%,
+    var(--rosa) 60% 80%,
+    var(--rojo) 80% 100%
+  );
 
   font-family:
     system-ui,
@@ -21,9 +50,10 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-  color: var(--color-texto);
-  background: var(--color-fondo);
+  color: var(--texto);
+  background: var(--fondo);
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 *,
@@ -40,6 +70,7 @@ body {
 h1 {
   font-size: 1.6rem;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 h2 {
   font-size: 1.25rem;
@@ -53,10 +84,15 @@ p {
   margin: 0;
 }
 
-/* ===== Encabezado ===== */
+/* =========================================================
+   Encabezado
+   ========================================================= */
 .encabezado {
-  background: var(--color-superficie);
-  border-bottom: 1px solid var(--color-borde);
+  /* Franja de colores arriba + fondo blanco */
+  background:
+    var(--franja) top / 100% 4px no-repeat,
+    var(--superficie);
+  border-bottom: 1px solid var(--borde);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -65,7 +101,7 @@ p {
 .encabezado-contenido {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0.75rem 1rem;
+  padding: 0.9rem 1rem 0.75rem;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -78,45 +114,55 @@ p {
 }
 
 .menu a {
-  color: var(--color-texto-suave);
+  color: var(--texto-suave);
   text-decoration: none;
-  padding: 0.4rem 0.8rem;
+  padding: 0.4rem 0.85rem;
   border-radius: 999px;
   font-weight: 500;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .menu a:hover {
-  background: var(--color-fondo);
+  background: var(--fondo);
+  color: var(--texto);
 }
 
 /* NavLink le agrega la clase "active" a la página actual */
 .menu a.active {
-  background: var(--color-primario-suave);
-  color: var(--color-primario);
+  background: var(--azul-suave);
+  color: var(--azul);
 }
 
 .usuario {
   margin-left: auto;
-  color: var(--color-texto-suave);
+  color: var(--texto-suave);
   font-size: 0.9rem;
 }
 
-/* ===== Contenido ===== */
+/* =========================================================
+   Contenido
+   ========================================================= */
 .contenido {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 1.5rem 1rem 3rem;
+  padding: 1.75rem 1rem 3rem;
 }
 
 .contenido section {
   display: grid;
   gap: 1rem;
+  /* La columna nunca supera el ancho disponible */
+  grid-template-columns: minmax(0, 1fr);
 }
 
-/* ===== Formularios ===== */
+/* =========================================================
+   Formularios
+   ========================================================= */
 form {
-  background: var(--color-superficie);
-  border: 1px solid var(--color-borde);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
   padding: 1.25rem;
@@ -140,9 +186,9 @@ form button {
 label {
   display: grid;
   gap: 0.35rem;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-texto-suave);
+  color: var(--texto-suave);
 }
 
 input,
@@ -150,18 +196,22 @@ select,
 textarea {
   font: inherit;
   width: 100%;
-  padding: 0.55rem 0.7rem;
-  border: 1px solid var(--color-borde);
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--borde);
   border-radius: 8px;
   background: #fff;
-  color: var(--color-texto);
+  color: var(--texto);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 3px solid var(--color-primario-suave);
-  border-color: var(--color-primario);
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px var(--azul-suave);
 }
 
 textarea {
@@ -169,21 +219,29 @@ textarea {
   resize: vertical;
 }
 
-/* ===== Botones ===== */
+/* =========================================================
+   Botones
+   ========================================================= */
 button {
   font: inherit;
   font-weight: 600;
   border: none;
   border-radius: 8px;
   padding: 0.55rem 1rem;
-  background: var(--color-primario);
+  background: var(--azul);
   color: #fff;
   cursor: pointer;
-  transition: background 0.15s;
+  transition:
+    background 0.15s,
+    transform 0.05s;
 }
 
 button:hover:not(:disabled) {
-  background: var(--color-primario-hover);
+  background: var(--azul-hover);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 button:disabled {
@@ -191,45 +249,56 @@ button:disabled {
   cursor: not-allowed;
 }
 
+button:focus-visible {
+  outline: 3px solid var(--azul-suave);
+  outline-offset: 2px;
+}
+
 button.secundario {
-  background: transparent;
-  color: var(--color-texto);
-  border: 1px solid var(--color-borde);
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1px solid var(--borde);
 }
 
 button.secundario:hover:not(:disabled) {
-  background: var(--color-fondo);
+  background: var(--fondo);
 }
 
 button.peligro {
-  background: var(--color-peligro-suave);
-  color: var(--color-peligro);
+  background: var(--rojo-suave);
+  color: var(--rojo);
 }
 
 button.peligro:hover:not(:disabled) {
-  background: #fecdca;
+  background: var(--rojo-hover);
 }
 
-/* ===== Mensajes ===== */
+/* =========================================================
+   Mensajes
+   ========================================================= */
 [role='alert'] {
-  background: var(--color-peligro-suave);
-  color: var(--color-peligro);
-  padding: 0.6rem 0.8rem;
+  background: var(--rojo-suave);
+  color: var(--rojo);
+  border-left: 4px solid var(--rojo);
+  padding: 0.6rem 0.85rem;
   border-radius: 8px;
 }
 
 [role='status'] {
-  background: var(--color-exito-suave);
-  color: var(--color-exito);
-  padding: 0.6rem 0.8rem;
+  background: var(--verde-suave);
+  color: var(--verde);
+  border-left: 4px solid var(--verde);
+  padding: 0.6rem 0.85rem;
   border-radius: 8px;
 }
 
-/* ===== Tablas ===== */
+/* =========================================================
+   Tablas
+   ========================================================= */
 .tabla-scroll {
   overflow-x: auto;
-  background: var(--color-superficie);
-  border: 1px solid var(--color-borde);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
 }
@@ -242,18 +311,18 @@ table {
 
 th,
 td {
-  padding: 0.7rem 1rem;
+  padding: 0.75rem 1rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-borde);
+  border-bottom: 1px solid var(--borde);
   white-space: nowrap;
 }
 
 th {
-  background: var(--color-fondo);
-  font-size: 0.8rem;
+  background: var(--azul-suave);
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-texto-suave);
+  letter-spacing: 0.05em;
+  color: var(--azul);
 }
 
 tbody tr:last-child td {
@@ -261,11 +330,11 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #f9fbfb;
+  background: #f8fbfd;
 }
 
 td button {
-  padding: 0.3rem 0.7rem;
+  padding: 0.3rem 0.75rem;
   font-size: 0.85rem;
 }
 
@@ -273,33 +342,48 @@ td button + button {
   margin-left: 0.4rem;
 }
 
-/* ===== Estados de turno ===== */
+/* =========================================================
+   Estados de turno
+   ========================================================= */
 .estado {
-  display: inline-block;
-  padding: 0.15rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.65rem;
   border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 600;
 }
 
-.estado-pending {
-  background: #fef0c7;
-  color: #93370d;
-}
-.estado-confirmed {
-  background: #d1e9ff;
-  color: #175cd3;
-}
-.estado-completed {
-  background: var(--color-exito-suave);
-  color: var(--color-exito);
-}
-.estado-cancelled {
-  background: #f2f4f7;
-  color: #475467;
+/* Puntito de color antes del texto */
+.estado::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
-/* ===== Filtros, pestañas y paneles ===== */
+.estado-pending {
+  background: var(--amarillo-suave);
+  color: var(--amarillo-texto);
+}
+.estado-confirmed {
+  background: var(--azul-suave);
+  color: var(--azul);
+}
+.estado-completed {
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+.estado-cancelled {
+  background: #eef1f4;
+  color: #5a6b78;
+}
+
+/* =========================================================
+   Filtros, pestañas y paneles
+   ========================================================= */
 .filtros {
   display: flex;
   gap: 0.75rem;
@@ -309,37 +393,46 @@ td button + button {
 .filtros input {
   flex: 1 1 240px;
   width: auto;
+  min-width: 0;
 }
 .filtros select {
   flex: 0 1 200px;
   width: auto;
+  min-width: 0;
 }
 
 .pestanias {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  justify-self: start;
 }
 
 .pestanias button {
   background: transparent;
-  color: var(--color-texto-suave);
+  color: var(--texto-suave);
+  padding: 0.45rem 1rem;
 }
 
 .pestanias button:hover:not(:disabled) {
-  background: var(--color-superficie);
+  background: var(--fondo);
 }
 
 /* La pestaña activa está "disabled": la mostramos resaltada */
 .pestanias button:disabled {
   opacity: 1;
   cursor: default;
-  background: var(--color-primario-suave);
-  color: var(--color-primario);
+  background: var(--azul);
+  color: #fff;
 }
 
 .panel {
-  background: var(--color-superficie);
-  border: 1px solid var(--color-borde);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-top: 4px solid var(--verde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
   padding: 1.25rem;
@@ -364,31 +457,51 @@ td button + button {
 }
 
 .lista-signos li {
-  border-left: 3px solid var(--color-primario);
-  background: var(--color-fondo);
+  border-left: 4px solid var(--verde);
+  background: var(--verde-suave);
   padding: 0.75rem 1rem;
   border-radius: 0 8px 8px 0;
+  display: grid;
+  gap: 0.2rem;
 }
 
-/* ===== Login ===== */
+/* =========================================================
+   Login
+   ========================================================= */
 .login-pagina {
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: 1rem;
+  background:
+    radial-gradient(circle at 15% 20%, var(--azul-suave) 0, transparent 40%),
+    radial-gradient(circle at 85% 80%, var(--verde-suave) 0, transparent 40%),
+    var(--fondo);
 }
 
 .login {
   width: min(400px, 100%);
   grid-template-columns: 1fr;
-  padding: 2rem;
+  padding: 2.25rem 2rem 2rem;
+  /* Franja de colores arriba de la tarjeta */
+  background:
+    var(--franja) top / 100% 6px no-repeat,
+    var(--superficie);
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.1);
 }
 
 .login h1 {
   text-align: center;
+  margin-bottom: 0.25rem;
 }
 
-/* ===== Celular ===== */
+.login button[type='submit'] {
+  padding: 0.7rem 1rem;
+}
+
+/* =========================================================
+   Celular
+   ========================================================= */
 @media (max-width: 640px) {
   h1 {
     font-size: 1.35rem;
@@ -402,6 +515,10 @@ td button + button {
     padding: 1rem;
   }
 
+  .login {
+    padding: 2rem 1.25rem 1.5rem;
+  }
+
   /* El nombre del usuario baja a una segunda línea */
   .encabezado-contenido > button {
     margin-left: auto;
@@ -411,5 +528,12 @@ td button + button {
     order: 3;
     width: 100%;
     margin-left: 0;
+  }
+
+  .pestanias {
+    justify-self: stretch;
+  }
+  .pestanias button {
+    flex: 1;
   }
 }

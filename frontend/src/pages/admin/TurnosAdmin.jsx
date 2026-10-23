@@ -74,7 +74,7 @@ export default function TurnosAdmin() {
     <section>
       <h2>Turnos</h2>
 
-      <div>
+      <div className="filtros">
         <input
           type="search"
           placeholder="Buscar por paciente"
@@ -104,8 +104,12 @@ export default function TurnosAdmin() {
           pacientes={pacientes}
           acciones={(t) => (
             <>
-              <button onClick={() => setEditando(t)}>Editar</button>
-              <button onClick={() => handleEliminar(t)}>Eliminar</button>
+              <button className="secundario" onClick={() => setEditando(t)}>
+                Editar
+              </button>
+              <button className="peligro" onClick={() => handleEliminar(t)}>
+                Eliminar
+              </button>
             </>
           )}
         />

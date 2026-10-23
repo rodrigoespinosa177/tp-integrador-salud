@@ -4,7 +4,7 @@ export default function ListaSignos({ registros }) {
   }
 
   return (
-    <ul>
+    <ul className="lista-signos">
       {registros.map((r) => (
         <li key={r._id}>
           <p>

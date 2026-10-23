@@ -9,7 +9,7 @@ export default function AdminPage() {
     <section>
       <h1>Panel de administración</h1>
 
-      <nav>
+      <nav className="pestanias">
         <button
           onClick={() => setPestania('usuarios')}
           disabled={pestania === 'usuarios'}

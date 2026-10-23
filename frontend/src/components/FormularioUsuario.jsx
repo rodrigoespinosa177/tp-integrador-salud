@@ -139,7 +139,7 @@ export default function FormularioUsuario({
         {guardando ? 'Guardando...' : 'Guardar'}
       </button>
       {onCancelar && (
-        <button type="button" onClick={onCancelar}>
+        <button type="button" className="secundario" onClick={onCancelar}>
           Cancelar
         </button>
       )}

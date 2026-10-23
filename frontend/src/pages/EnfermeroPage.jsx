@@ -72,7 +72,7 @@ export default function EnfermeroPage() {
       )}
 
       {turnoSeleccionado && (
-        <section>
+        <section className="panel">
           <h2>
             {pacientes[turnoSeleccionado.patient_id]} ·{' '}
             {formatearFecha(turnoSeleccionado.date)} {turnoSeleccionado.hour}
@@ -82,7 +82,12 @@ export default function EnfermeroPage() {
           <ListaSignos registros={registros} />
           <FormularioSignos onGuardar={handleGuardarSignos} />
 
-          <button onClick={() => setTurnoSeleccionado(null)}>Cerrar</button>
+          <button
+            className="secundario"
+            onClick={() => setTurnoSeleccionado(null)}
+          >
+            Cerrar
+          </button>
         </section>
       )}
     </section>

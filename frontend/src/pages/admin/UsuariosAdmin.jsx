@@ -68,7 +68,7 @@ export default function UsuariosAdmin() {
     <section>
       <h2>Usuarios</h2>
 
-      <div>
+      <div className="filtros">
         <input
           type="search"
           placeholder="Buscar por nombre o email"
@@ -97,8 +97,12 @@ export default function UsuariosAdmin() {
           usuarios={visibles}
           acciones={(u) => (
             <>
-              <button onClick={() => setEditando(u)}>Editar</button>
-              <button onClick={() => handleEliminar(u)}>Eliminar</button>
+              <button className="secundario" onClick={() => setEditando(u)}>
+                Editar
+              </button>
+              <button className="peligro" onClick={() => handleEliminar(u)}>
+                Eliminar
+              </button>
             </>
           )}
         />

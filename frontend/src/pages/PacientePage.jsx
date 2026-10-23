@@ -54,7 +54,9 @@ export default function PacientePage() {
           turnos={turnos}
           acciones={(t) =>
             (t.status === 'pending' || t.status === 'confirmed') && (
-              <button onClick={() => handleCancelar(t._id)}>Cancelar</button>
+              <button className="peligro" onClick={() => handleCancelar(t._id)}>
+                Cancelar
+              </button>
             )
           }
         />
