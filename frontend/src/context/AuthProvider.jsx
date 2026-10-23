@@ -32,8 +32,13 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, actualizarSesion }}>
       {children}
     </AuthContext.Provider>
   );
+
+  function actualizarSesion(datosNuevos) {
+    localStorage.setItem('user', JSON.stringify(datosNuevos));
+    setUser(datosNuevos);
+  }
 }
