@@ -16,6 +16,7 @@ export default function FormularioUsuario({
   onGuardar,
   onCancelar,
   permitirRol = true,
+  titulo,
 }) {
   const esEdicion = Boolean(inicial);
   const [datos, setDatos] = useState({ ...VACIO, ...inicial, password: '' });
@@ -38,7 +39,11 @@ export default function FormularioUsuario({
     setGuardando(true);
     try {
       await onGuardar(aEnviar);
-      if (!esEdicion) setDatos(VACIO);
+      if (esEdicion) {
+        setDatos((prev) => ({ ...prev, password: '' }));
+      } else {
+        setDatos(VACIO);
+      }
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
@@ -48,7 +53,7 @@ export default function FormularioUsuario({
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>{esEdicion ? 'Editar usuario' : 'Nuevo usuario'}</h2>
+      <h2>{titulo || (esEdicion ? 'Editar usuario' : 'Nuevo usuario')}</h2>
 
       <label>
         Nombre
