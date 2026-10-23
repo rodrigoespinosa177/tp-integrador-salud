@@ -1,0 +1,539 @@
+/* =========================================================
+   Paleta inspirada en los colores de uniformes sanitarios
+   ========================================================= */
+:root {
+  /* Azul: color principal */
+  --azul: #1f6fb2;
+  --azul-hover: #185a91;
+  --azul-suave: #e4f1fb;
+
+  /* Verde: éxito, atendido */
+  --verde: #2e8b57;
+  --verde-suave: #e3f4ea;
+
+  /* Amarillo: pendiente */
+  --amarillo: #f4c430;
+  --amarillo-texto: #8a6100;
+  --amarillo-suave: #fff6d6;
+
+  /* Rosa: acento decorativo */
+  --rosa: #e88aa8;
+
+  /* Rojo: errores y acciones peligrosas */
+  --rojo: #d92d20;
+  --rojo-hover: #fbd5d1;
+  --rojo-suave: #fde8e6;
+
+  /* Neutros */
+  --fondo: #f3f7fa;
+  --superficie: #ffffff;
+  --borde: #d9e3ea;
+  --texto: #1b2a36;
+  --texto-suave: #5a6b78;
+
+  --radio: 12px;
+  --sombra: 0 1px 2px rgba(16, 24, 40, 0.05), 0 2px 8px rgba(16, 24, 40, 0.06);
+
+  /* Franja con los 5 colores */
+  --franja: linear-gradient(
+    90deg,
+    var(--azul) 0 20%,
+    var(--verde) 20% 40%,
+    var(--amarillo) 40% 60%,
+    var(--rosa) 60% 80%,
+    var(--rojo) 80% 100%
+  );
+
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: var(--texto);
+  background: var(--fondo);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+h2 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+h3 {
+  font-size: 1.05rem;
+  margin: 0;
+}
+p {
+  margin: 0;
+}
+
+/* =========================================================
+   Encabezado
+   ========================================================= */
+.encabezado {
+  /* Franja de colores arriba + fondo blanco */
+  background:
+    var(--franja) top / 100% 4px no-repeat,
+    var(--superficie);
+  border-bottom: 1px solid var(--borde);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.encabezado-contenido {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.9rem 1rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.menu {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.menu a {
+  color: var(--texto-suave);
+  text-decoration: none;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 500;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.menu a:hover {
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+/* NavLink le agrega la clase "active" a la página actual */
+.menu a.active {
+  background: var(--azul-suave);
+  color: var(--azul);
+}
+
+.usuario {
+  margin-left: auto;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+/* =========================================================
+   Contenido
+   ========================================================= */
+.contenido {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.75rem 1rem 3rem;
+}
+
+.contenido section {
+  display: grid;
+  gap: 1rem;
+  /* La columna nunca supera el ancho disponible */
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* =========================================================
+   Formularios
+   ========================================================= */
+form {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+form h1,
+form h2,
+form h3,
+form [role='alert'],
+label:has(textarea) {
+  grid-column: 1 / -1;
+}
+
+form button {
+  align-self: end;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--texto);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px var(--azul-suave);
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* =========================================================
+   Botones
+   ========================================================= */
+button {
+  font: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  background: var(--azul);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    transform 0.05s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--azul-hover);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--azul-suave);
+  outline-offset: 2px;
+}
+
+button.secundario {
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1px solid var(--borde);
+}
+
+button.secundario:hover:not(:disabled) {
+  background: var(--fondo);
+}
+
+button.peligro {
+  background: var(--rojo-suave);
+  color: var(--rojo);
+}
+
+button.peligro:hover:not(:disabled) {
+  background: var(--rojo-hover);
+}
+
+/* =========================================================
+   Mensajes
+   ========================================================= */
+[role='alert'] {
+  background: var(--rojo-suave);
+  color: var(--rojo);
+  border-left: 4px solid var(--rojo);
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+}
+
+[role='status'] {
+  background: var(--verde-suave);
+  color: var(--verde);
+  border-left: 4px solid var(--verde);
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+}
+
+/* =========================================================
+   Tablas
+   ========================================================= */
+.tabla-scroll {
+  overflow-x: auto;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--borde);
+  white-space: nowrap;
+}
+
+th {
+  background: var(--azul-suave);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--azul);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #f8fbfd;
+}
+
+td button {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+td button + button {
+  margin-left: 0.4rem;
+}
+
+/* =========================================================
+   Estados de turno
+   ========================================================= */
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Puntito de color antes del texto */
+.estado::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.estado-pending {
+  background: var(--amarillo-suave);
+  color: var(--amarillo-texto);
+}
+.estado-confirmed {
+  background: var(--azul-suave);
+  color: var(--azul);
+}
+.estado-completed {
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+.estado-cancelled {
+  background: #eef1f4;
+  color: #5a6b78;
+}
+
+/* =========================================================
+   Filtros, pestañas y paneles
+   ========================================================= */
+.filtros {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filtros input {
+  flex: 1 1 240px;
+  width: auto;
+  min-width: 0;
+}
+.filtros select {
+  flex: 0 1 200px;
+  width: auto;
+  min-width: 0;
+}
+
+.pestanias {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  justify-self: start;
+}
+
+.pestanias button {
+  background: transparent;
+  color: var(--texto-suave);
+  padding: 0.45rem 1rem;
+}
+
+.pestanias button:hover:not(:disabled) {
+  background: var(--fondo);
+}
+
+/* La pestaña activa está "disabled": la mostramos resaltada */
+.pestanias button:disabled {
+  opacity: 1;
+  cursor: default;
+  background: var(--azul);
+  color: #fff;
+}
+
+.panel {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-top: 4px solid var(--verde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.25rem;
+}
+
+.panel form {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.panel > button {
+  justify-self: start;
+}
+
+.lista-signos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.lista-signos li {
+  border-left: 4px solid var(--verde);
+  background: var(--verde-suave);
+  padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+/* =========================================================
+   Login
+   ========================================================= */
+.login-pagina {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 15% 20%, var(--azul-suave) 0, transparent 40%),
+    radial-gradient(circle at 85% 80%, var(--verde-suave) 0, transparent 40%),
+    var(--fondo);
+}
+
+.login {
+  width: min(400px, 100%);
+  grid-template-columns: 1fr;
+  padding: 2.25rem 2rem 2rem;
+  /* Franja de colores arriba de la tarjeta */
+  background:
+    var(--franja) top / 100% 6px no-repeat,
+    var(--superficie);
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.1);
+}
+
+.login h1 {
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+.login button[type='submit'] {
+  padding: 0.7rem 1rem;
+}
+
+/* =========================================================
+   Celular
+   ========================================================= */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.35rem;
+  }
+
+  .contenido {
+    padding: 1rem 0.75rem 2rem;
+  }
+
+  form {
+    padding: 1rem;
+  }
+
+  .login {
+    padding: 2rem 1.25rem 1.5rem;
+  }
+
+  /* El nombre del usuario baja a una segunda línea */
+  .encabezado-contenido > button {
+    margin-left: auto;
+    order: 2;
+  }
+  .usuario {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .pestanias {
+    justify-self: stretch;
+  }
+  .pestanias button {
+    flex: 1;
+  }
+}
