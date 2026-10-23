@@ -5,6 +5,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import PacientePage from './pages/PacientePage';
 import EnfermeroPage from './pages/EnfermeroPage';
 import AdminPage from './pages/AdminPage';
+import PerfilPage from './pages/PerfilPage';
 
 export default function App() {
   return (
@@ -22,6 +23,9 @@ export default function App() {
           </Route>
           <Route element={<ProtectedRoute roles={['administrator']} />}>
             <Route path="/admin" element={<AdminPage />} />
+          </Route>
+          <Route element={<ProtectedRoute roles={['patient', 'nurse']} />}>
+            <Route path="/perfil" element={<PerfilPage />} />
           </Route>
         </Route>
       </Route>
