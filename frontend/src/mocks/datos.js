@@ -3,6 +3,7 @@ export const usuarios = [
     _id: 'u1',
     first_name: 'Ana',
     last_name: 'Admin',
+    dni: '30111222',
     email: 'admin@test.com',
     password: '123456',
     rol: 'administrator',
@@ -13,6 +14,7 @@ export const usuarios = [
     _id: 'u2',
     first_name: 'Nora',
     last_name: 'Enfermera',
+    dni: '30333444',
     email: 'nurse@test.com',
     password: '123456',
     rol: 'nurse',
@@ -23,17 +25,18 @@ export const usuarios = [
     _id: 'u3',
     first_name: 'Pablo',
     last_name: 'Paciente',
+    dni: '30555666',
     email: 'patient@test.com',
     password: '123456',
     rol: 'patient',
     phone: '2613333333',
     birthdate: '2000-11-02',
   },
-
   {
     _id: 'u4',
     first_name: 'Lucía',
     last_name: 'Gómez',
+    dni: '30777888',
     email: 'lucia@test.com',
     password: '123456',
     rol: 'patient',
@@ -64,7 +67,6 @@ export const turnos = [
     motive: 'Dolor de cabeza',
     assigned_by_id: 'u1',
   },
-
   {
     _id: 't3',
     patient_id: 'u4',

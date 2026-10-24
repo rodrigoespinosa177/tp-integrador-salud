@@ -4,12 +4,25 @@ import { ETIQUETA_ROL } from '../utils/usuarios';
 const VACIO = {
   first_name: '',
   last_name: '',
+  dni: '',
   email: '',
   password: '',
   rol: 'patient',
   phone: '',
   birthdate: '',
 };
+
+// Únicos campos que acepta el back (rechaza cualquier otro)
+const CAMPOS = [
+  'first_name',
+  'last_name',
+  'dni',
+  'email',
+  'password',
+  'rol',
+  'phone',
+  'birthdate',
+];
 
 export default function FormularioUsuario({
   inicial,
@@ -31,9 +44,12 @@ export default function FormularioUsuario({
     e.preventDefault();
     setError('');
 
-    const aEnviar = { ...datos };
-    delete aEnviar._id;
-    if (esEdicion && !aEnviar.password) delete aEnviar.password;
+    // Arma el envío solo con campos válidos y con valor
+    // (la contraseña vacía al editar, o el teléfono vacío, no se mandan)
+    const aEnviar = {};
+    CAMPOS.forEach((campo) => {
+      if (datos[campo]) aEnviar[campo] = datos[campo];
+    });
     if (!permitirRol) delete aEnviar.rol;
 
     setGuardando(true);
@@ -70,6 +86,19 @@ export default function FormularioUsuario({
         <input
           name="last_name"
           value={datos.last_name}
+          onChange={handleChange}
+          required
+        />
+      </label>
+
+      <label>
+        DNI
+        <input
+          name="dni"
+          inputMode="numeric"
+          pattern="\d{7,8}"
+          title="7 u 8 números, sin puntos"
+          value={datos.dni}
           onChange={handleChange}
           required
         />
@@ -118,7 +147,7 @@ export default function FormularioUsuario({
         <input
           type="tel"
           name="phone"
-          value={datos.phone}
+          value={datos.phone || ''}
           onChange={handleChange}
         />
       </label>
@@ -128,7 +157,7 @@ export default function FormularioUsuario({
         <input
           type="date"
           name="birthdate"
-          value={datos.birthdate}
+          value={datos.birthdate || ''}
           onChange={handleChange}
         />
       </label>
