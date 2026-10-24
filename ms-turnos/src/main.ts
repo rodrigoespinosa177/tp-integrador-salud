@@ -6,6 +6,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // El frontend (Vite) corre en otro puerto
+  app.enableCors();
+
   // Validación automática de DTOs
   app.useGlobalPipes(
     new ValidationPipe({
@@ -17,9 +20,10 @@ async function bootstrap() {
 
   // Documentación Swagger para el servicio de turnos
   const config = new DocumentBuilder()
-    .setTitle('Microservicio de Turnos y Signos Vitales')
-    .setDescription('API REST para MedicalAppointments y SignsAndSymptoms')
+    .setTitle('Microservicio de Turnos')
+    .setDescription('API REST para la gestión de turnos médicos (MedicalAppointment)')
     .setVersion('1.0')
+    .addTag('appointments', 'Gestión de turnos médicos')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
