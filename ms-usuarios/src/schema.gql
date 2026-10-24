@@ -27,6 +27,7 @@ type UsuarioModel {
   _id: ID!
   birthdate: DateTime
   createdAt: DateTime
+  dni: String!
   email: String!
   first_name: String!
   is_active: Boolean!

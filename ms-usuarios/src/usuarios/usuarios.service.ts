@@ -39,6 +39,9 @@ export class UsuariosService {
       return await nuevoUsuario.save();
     } catch (error: any) {
       if (error.code === 11000) {
+        if (error.keyPattern?.dni) {
+          throw new ConflictException(`El DNI ${resto.dni} ya está registrado`);
+        }
         throw new ConflictException(`El email ${email} ya está registrado`);
       }
       throw new InternalServerErrorException('Error al crear el usuario');
@@ -61,16 +64,33 @@ export class UsuariosService {
     return this.usuarioModel.findOne({ email }).exec();
   }
 
+  async findByDni(dni: string): Promise<UsuarioDocument> {
+    const usuario = await this.usuarioModel.findOne({ dni }).select('-password').exec();
+    if (!usuario) {
+      throw new NotFoundException(`No existe un usuario con DNI ${dni}`);
+    }
+    return usuario;
+  }
+
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto): Promise<UsuarioDocument> {
     if (updateUsuarioDto.password) {
       const salt = await bcrypt.genSalt(10);
       updateUsuarioDto.password = await bcrypt.hash(updateUsuarioDto.password, salt);
     }
 
-    const usuario = await this.usuarioModel
-      .findByIdAndUpdate(id, updateUsuarioDto, { new: true })
-      .select('-password')
-      .exec();
+    let usuario: UsuarioDocument | null;
+    try {
+      usuario = await this.usuarioModel
+        .findByIdAndUpdate(id, updateUsuarioDto, { new: true })
+        .select('-password')
+        .exec();
+    } catch (error: any) {
+      if (error.code === 11000) {
+        const campo = error.keyPattern?.dni ? 'DNI' : 'email';
+        throw new ConflictException(`El ${campo} ya está registrado`);
+      }
+      throw error;
+    }
 
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);

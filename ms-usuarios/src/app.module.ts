@@ -24,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       playground: true, // Habilita el sandbox/playground para pruebas
+      context: ({ req }: { req: unknown }) => ({ req }), // Los guards necesitan el request para leer el JWT
     }),
     UsuariosModule,
     AuthModule,

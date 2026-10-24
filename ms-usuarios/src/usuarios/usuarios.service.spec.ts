@@ -38,6 +38,7 @@ describe('UsuariosService', () => {
       const dto: CreateUsuarioDto = {
         first_name: 'Ruben',
         last_name: 'Ledesma',
+        dni: '40123456',
         email: 'duplicado@test.com',
         password: 'Password123!',
         rol: Rol.PATIENT,
