@@ -1,8 +1,15 @@
+import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Args, ID } from '@nestjs/graphql';
 import { UsuariosService } from './usuarios.service';
 import { UsuarioModel } from './models/usuario.model';
 import { Rol } from './enums/rol.enum';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
+// Mismo criterio que el REST: hay que mandar el JWT y ser Administrator
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Rol.ADMINISTRATOR)
 @Resolver(() => UsuarioModel)
 export class UsuariosResolver {
   constructor(private readonly usuariosService: UsuariosService) {}

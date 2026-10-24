@@ -7,6 +7,7 @@ import {
   MinLength,
   IsDateString,
   IsBoolean,
+  Matches,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Rol } from '../enums/rol.enum';
@@ -21,6 +22,12 @@ export class CreateUsuarioDto {
   @IsString()
   @IsNotEmpty({ message: 'El apellido es obligatorio' })
   last_name: string;
+
+  @ApiProperty({ example: '40123456', description: 'DNI del usuario (solo números)' })
+  @IsString()
+  @IsNotEmpty({ message: 'El DNI es obligatorio' })
+  @Matches(/^\d{7,8}$/, { message: 'El DNI debe tener 7 u 8 dígitos numéricos' })
+  dni: string;
 
   @ApiProperty({ example: 'ruben@ejemplo.com', description: 'Correo único' })
   @IsEmail({}, { message: 'El formato de email no es válido' })

@@ -12,6 +12,9 @@ export class Usuario {
   @Prop({ required: true, trim: true })
   last_name: string;
 
+  @Prop({ required: true, unique: true, trim: true })
+  dni: string;
+
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email: string;
 

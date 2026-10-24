@@ -13,6 +13,9 @@ export class UsuarioModel {
   last_name: string;
 
   @Field()
+  dni: string;
+
+  @Field()
   email: string;
 
   @Field(() => Rol)

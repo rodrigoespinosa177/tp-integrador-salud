@@ -18,23 +18,19 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Proxy hacia ms-usuarios (REST, Auth, Swagger y el esquema JSON de Swagger)
+  // Proxy inverso hacia ms-usuarios usando pathFilter (sintaxis oficial v3)
   app.use(
-    ['/usuarios', '/auth', '/api/docs', '/api/docs-json'],
     createProxyMiddleware({
       target: usuariosServiceUrl,
       changeOrigin: true,
-      logger: console,
-    }),
-  );
-
-  // Proxy hacia ms-usuarios (GraphQL)
-  app.use(
-    '/graphql',
-    createProxyMiddleware({
-      target: usuariosServiceUrl,
-      changeOrigin: true,
-      ws: true,
+      pathFilter: (pathname: string) => {
+        return (
+          pathname.startsWith('/usuarios') ||
+          pathname.startsWith('/auth') ||
+          pathname.startsWith('/api/docs') ||
+          pathname.startsWith('/graphql')
+        );
+      },
     }),
   );
 
