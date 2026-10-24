@@ -18,7 +18,8 @@ export class Usuario {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true, enum: Rol, default: Rol.PATIENT })
+  // Se añade type: String para resolver la ambigüedad en Jest y Mongoose
+  @Prop({ type: String, required: true, enum: Rol, default: Rol.PATIENT })
   rol: Rol;
 
   @Prop({ required: false, trim: true })
