@@ -12,11 +12,16 @@ import { AppointmentStatus } from '../appointment-status.enum';
 
 @InputType()
 export class CreateAppointmentDto {
-  @ApiProperty({ example: '665f1c2e8b3a4c0012a4d111' })
-  @Field()
+  @ApiPropertyOptional({
+    example: '665f1c2e8b3a4c0012a4d111',
+    description:
+      'Paciente del turno. Obligatorio para el administrador; si el que crea es un paciente, siempre se usa su propio id',
+  })
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  patient_id: string;
+  patient_id?: string;
 
   @ApiProperty({ example: '2026-10-28', description: 'Formato YYYY-MM-DD' })
   @Field()
@@ -36,11 +41,15 @@ export class CreateAppointmentDto {
   @IsNotEmpty()
   motive: string;
 
-  @ApiProperty({ example: '665f1c2e8b3a4c0012a4d111' })
-  @Field()
+  @ApiPropertyOptional({
+    example: '665f1c2e8b3a4c0012a4d111',
+    description: 'Se ignora: siempre es el usuario del token',
+  })
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  assigned_by_id: string;
+  assigned_by_id?: string;
 
   @ApiPropertyOptional({ enum: AppointmentStatus, default: 'pending' })
   @Field(() => AppointmentStatus, { nullable: true })

@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { SignsAndSymptomsModule } from './signs-and-symptoms/signs-and-symptoms.module';
 
@@ -26,8 +27,11 @@ import { SignsAndSymptomsModule } from './signs-and-symptoms/signs-and-symptoms.
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      // Los guards leen el usuario del JWT desde req
+      context: ({ req }: { req: unknown }) => ({ req }),
     }),
 
+    AuthModule,
     AppointmentsModule,
     SignsAndSymptomsModule,
   ],
