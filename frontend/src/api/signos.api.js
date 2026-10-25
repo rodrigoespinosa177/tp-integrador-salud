@@ -14,16 +14,18 @@ export async function obtenerSignosPorTurno(turnoId) {
 export async function crearSignos(datos) {
   if (USE_MOCKS) {
     await esperar();
-    const existeTurno = turnos.some(
-      (t) => t._id === datos.medical_appointment_id,
-    );
-    if (!existeTurno) throw new Error('El turno no existe');
+    const turno = turnos.find((t) => t._id === datos.medical_appointment_id);
+    if (!turno) throw new Error('El turno no existe');
+    if (turno.status !== 'confirmed' && turno.status !== 'completed') {
+      throw new Error('Solo se pueden registrar signos en turnos confirmados');
+    }
     const nuevo = {
       _id: nuevoId('s'),
       date: new Date().toISOString(),
       ...datos,
     };
     signos.push(nuevo);
+    turno.status = 'completed';
     return nuevo;
   }
   const { data } = await apiTurnos.post('/signs-and-symptoms', datos);
