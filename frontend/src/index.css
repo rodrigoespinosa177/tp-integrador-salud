@@ -110,6 +110,7 @@ a {
   text-decoration: none;
   font-weight: 700;
   font-size: 1.0625rem;
+  letter-spacing: 0.08em;
   white-space: nowrap;
 }
 
@@ -300,6 +301,39 @@ textarea {
   resize: vertical;
 }
 
+/* Campo de contraseña con el botón del ojo adentro */
+.campo-password {
+  position: relative;
+  display: block;
+}
+
+.campo-password input {
+  padding-right: 3rem;
+}
+
+.ver-password {
+  position: absolute;
+  top: 50%;
+  right: 0.2rem;
+  transform: translateY(-50%);
+  width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--texto-suave);
+}
+
+.ver-password:hover:not(:disabled) {
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+.ver-password svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
 /* =========================================================
    Botones
    ========================================================= */
@@ -542,6 +576,208 @@ td button + button {
 }
 
 /* =========================================================
+   Páginas internas
+   ========================================================= */
+.contenido section.pagina {
+  gap: 1.75rem;
+}
+
+.pagina-encabezado {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.pagina-encabezado p {
+  color: var(--texto-suave);
+}
+
+.bloque {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/* Estado vacío: invita a hacer algo, no solo informa */
+.vacio {
+  border: 2px dashed var(--borde-fuerte);
+  border-radius: var(--radio-grande);
+  padding: 1.75rem;
+  display: grid;
+  gap: 0.35rem;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+.vacio h2 {
+  font-size: var(--titulo-3);
+  color: var(--texto);
+}
+
+/* =========================================================
+   Próximo turno: comprobante con troquel
+   ========================================================= */
+.turno-destacado {
+  --ancho-talon: 8rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--ancho-talon) 1fr auto;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+/* Las dos muescas del troquel, arriba y abajo de la línea punteada */
+.turno-destacado::before,
+.turno-destacado::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--ancho-talon) - 11px);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  z-index: 1;
+}
+
+.turno-destacado::before {
+  top: -12px;
+}
+.turno-destacado::after {
+  bottom: -12px;
+}
+
+.turno-fecha {
+  background: var(--azul);
+  color: #fff;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+}
+
+.turno-dia {
+  font-size: 3.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.turno-mes {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #d6e4f3;
+}
+
+.turno-info {
+  border-left: 2px dashed var(--borde-fuerte);
+  padding: 1.5rem 1.75rem;
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.turno-info h2 {
+  font-size: var(--titulo-3);
+  color: var(--texto-suave);
+}
+
+.turno-cuando {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* El día de la semana arranca con mayúscula ("Miércoles a las...") */
+.turno-cuando::first-letter {
+  text-transform: uppercase;
+}
+
+.turno-motivo {
+  color: var(--texto-suave);
+}
+
+.turno-ayuda {
+  margin-top: 0.4rem;
+  font-size: 0.9375rem;
+  color: var(--texto-suave);
+}
+
+.turno-acciones {
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* =========================================================
+   Pasos del turno: Pedido → Confirmado → Atendido
+   ========================================================= */
+.pasos {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: flex;
+  max-width: 28rem;
+}
+
+.paso {
+  flex: 1;
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 0.45rem;
+  font-size: 0.9375rem;
+  color: var(--texto-suave);
+}
+
+/* La línea que une un paso con el siguiente */
+.paso:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: calc(0.5rem - 1px);
+  left: 1rem;
+  right: 0;
+  height: 2px;
+  background: var(--borde);
+}
+
+.paso-punto {
+  position: relative;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid var(--borde-fuerte);
+  background: var(--superficie);
+}
+
+.paso.hecho .paso-punto {
+  background: var(--verde);
+  border-color: var(--verde);
+}
+
+.paso.hecho::before {
+  background: var(--verde);
+}
+
+.paso.actual {
+  color: var(--texto);
+  font-weight: 700;
+}
+
+.paso.actual .paso-punto {
+  background: var(--azul);
+  border-color: var(--azul);
+  box-shadow: 0 0 0 4px var(--azul-suave);
+}
+
+/* Si el turno está pendiente, el paso actual va en amarillo */
+.pasos[data-estado='pending'] .paso.actual .paso-punto {
+  background: var(--amarillo);
+  border-color: var(--amarillo);
+  box-shadow: 0 0 0 4px var(--amarillo-suave);
+}
+
+/* =========================================================
    Login y registro: pantalla dividida
    ========================================================= */
 .auth {
@@ -725,9 +961,46 @@ td button + button {
   .pestanias button {
     flex: 1;
   }
-
   .auth-fila {
     grid-template-columns: 1fr;
+  }
+
+  /* Comprobante en celular: talón más angosto y el botón abajo */
+  .turno-destacado {
+    --ancho-talon: 5.5rem;
+    grid-template-columns: var(--ancho-talon) 1fr;
+  }
+
+  .turno-dia {
+    font-size: 2.5rem;
+  }
+
+  .turno-info {
+    padding: 1.25rem;
+  }
+
+  .turno-cuando {
+    font-size: 1.25rem;
+  }
+
+  .turno-acciones {
+    grid-column: 1 / -1;
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--borde);
+  }
+
+  .turno-acciones button {
+    width: 100%;
+  }
+
+  /* Abajo está el botón: la muesca inferior no corresponde */
+  .turno-destacado::after {
+    display: none;
+  }
+
+  .paso {
+    font-size: 0.8125rem;
+    padding-right: 0.5rem;
   }
 }
 

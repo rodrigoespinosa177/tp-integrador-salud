@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RUTA_POR_ROL } from '../routes/rutasPorRol';
 import AuthLayout from '../components/AuthLayout';
+import CampoPassword from '../components/CampoPassword';
 
 const VACIO = {
   first_name: '',
@@ -101,19 +102,15 @@ export default function RegistroPage() {
           />
         </label>
 
-        <label>
-          Contraseña
-          <input
-            type="password"
-            name="password"
-            autoComplete="new-password"
-            minLength={6}
-            value={datos.password}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
+        <CampoPassword
+          label="Contraseña"
+          name="password"
+          autoComplete="new-password"
+          minLength={6}
+          value={datos.password}
+          onChange={handleChange}
+          required
+        />
         <label>
           Teléfono (opcional)
           <input

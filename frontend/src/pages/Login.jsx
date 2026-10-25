@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RUTA_POR_ROL } from '../routes/rutasPorRol';
 import AuthLayout from '../components/AuthLayout';
+import CampoPassword from '../components/CampoPassword';
 
 export default function Login() {
   const { user, login } = useAuth();
@@ -46,16 +47,13 @@ export default function Login() {
           />
         </label>
 
-        <label>
-          Contraseña
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
+        <CampoPassword
+          label="Contraseña"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
         {error && <p role="alert">{error}</p>}
 

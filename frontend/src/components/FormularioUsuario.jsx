@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ETIQUETA_ROL } from '../utils/usuarios';
-
+import CampoPassword from './CampoPassword';
 const VACIO = {
   first_name: '',
   last_name: '',
@@ -115,19 +115,19 @@ export default function FormularioUsuario({
         />
       </label>
 
-      <label>
-        {esEdicion
-          ? 'Nueva contraseña (dejar vacío para no cambiarla)'
-          : 'Contraseña'}
-        <input
-          type="password"
-          name="password"
-          value={datos.password}
-          onChange={handleChange}
-          required={!esEdicion}
-          minLength={6}
-        />
-      </label>
+      <CampoPassword
+        label={
+          esEdicion
+            ? 'Nueva contraseña (dejar vacío para no cambiarla)'
+            : 'Contraseña'
+        }
+        name="password"
+        autoComplete="new-password"
+        value={datos.password}
+        onChange={handleChange}
+        required={!esEdicion}
+        minLength={6}
+      />
 
       {permitirRol && (
         <label>
