@@ -1,0 +1,68 @@
+services:
+  # Base de datos compartida (cada microservicio usa su propia base adentro)
+  mongo:
+    image: mongo:7
+    container_name: tp-mongo
+    attach: false
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+
+  ms-usuarios:
+    build: ./ms-usuarios
+    container_name: tp-ms-usuarios
+    environment:
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/tp_usuarios
+      JWT_SECRET: ${JWT_SECRET:-clave-de-desarrollo-del-integrador}
+      JWT_EXPIRES_IN: 24h
+    ports:
+      - '3001:3001'
+    depends_on:
+      - mongo
+
+  ms-turnos:
+    build: ./ms-turnos
+    container_name: tp-ms-turnos
+    environment:
+      PORT: 3002
+      MONGODB_URI: mongodb://mongo:27017/tp_turnos
+      JWT_SECRET: ${JWT_SECRET:-clave-de-desarrollo-del-integrador}
+      # Para la llamada interna que valida pacientes y enfermeros
+      MS_USUARIOS_URL: http://ms-usuarios:3001
+    ports:
+      - '3002:3002'
+    depends_on:
+      - mongo
+      - ms-usuarios
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: tp-api-gateway
+    environment:
+      PORT: 3000
+      MS_USUARIOS_URL: http://ms-usuarios:3001
+      MS_TURNOS_URL: http://ms-turnos:3002
+    ports:
+      - '3000:3000'
+    depends_on:
+      - ms-usuarios
+      - ms-turnos
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_USE_MOCKS_USUARIOS: 'false'
+        VITE_USE_MOCKS_TURNOS: 'true'
+        VITE_API_USUARIOS_URL: http://localhost:3000
+        VITE_API_TURNOS_URL: http://localhost:3000
+    container_name: tp-frontend
+    ports:
+      - '5173:80'
+    depends_on:
+      - api-gateway
+
+volumes:
+  mongo-data:
