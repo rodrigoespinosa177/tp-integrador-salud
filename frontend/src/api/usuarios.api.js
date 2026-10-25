@@ -12,7 +12,14 @@ export async function obtenerUsuarios(rol) {
     await esperar();
     return usuarios.filter((u) => !rol || u.rol === rol).map(sinPassword);
   }
-  // El back no filtra por rol, así que filtramos acá
+
+  // Los pacientes se piden a /usuarios/pacientes (lo pueden ver admin y enfermero)
+  if (rol === 'patient') {
+    const { data } = await apiUsuarios.get('/usuarios/pacientes');
+    return data.map(normalizarUsuario);
+  }
+
+  // El listado completo es solo para el admin
   const { data } = await apiUsuarios.get('/usuarios');
   return data.filter((u) => !rol || u.rol === rol).map(normalizarUsuario);
 }
