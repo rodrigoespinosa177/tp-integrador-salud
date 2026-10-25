@@ -1,4 +1,4 @@
-import { USE_MOCKS } from '../config';
+import { USE_MOCKS_TURNOS as USE_MOCKS } from '../config';
 import { apiTurnos } from './http';
 import { turnos, esperar, nuevoId } from '../mocks/datos';
 

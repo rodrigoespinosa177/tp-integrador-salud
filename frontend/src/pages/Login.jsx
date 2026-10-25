@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RUTA_POR_ROL } from '../routes/rutasPorRol';
 
@@ -56,6 +56,9 @@ export default function Login() {
         <button type="submit" disabled={cargando}>
           {cargando ? 'Ingresando...' : 'Ingresar'}
         </button>
+        <p className="login-pie">
+          ¿No tenés cuenta? <Link to="/registro">Registrate</Link>
+        </p>
       </form>
     </div>
   );

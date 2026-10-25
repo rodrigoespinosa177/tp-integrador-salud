@@ -57,7 +57,27 @@ describe('UsuariosService', () => {
       );
 
       // Verificamos que se haya llamado a findOne con el email enviado
-      expect(mockUsuarioModel.findOne).toHaveBeenCalledWith({ email: dto.email });
+      expect(mockUsuarioModel.findOne).toHaveBeenCalledWith({
+        email: dto.email,
+      });
+    });
+  });
+
+  describe('findPacientes', () => {
+    it('debe buscar solo usuarios con rol patient y activos, sin la contraseña', async () => {
+      const pacientes = [{ _id: '1', first_name: 'Rodrigo', rol: Rol.PATIENT }];
+      const exec = jest.fn().mockResolvedValue(pacientes);
+      const select = jest.fn().mockReturnValue({ exec });
+      mockUsuarioModel.find = jest.fn().mockReturnValue({ select });
+
+      const resultado = await service.findPacientes();
+
+      expect(mockUsuarioModel.find).toHaveBeenCalledWith({
+        rol: Rol.PATIENT,
+        is_active: true,
+      });
+      expect(select).toHaveBeenCalledWith('-password');
+      expect(resultado).toEqual(pacientes);
     });
   });
 });

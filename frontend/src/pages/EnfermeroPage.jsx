@@ -14,23 +14,33 @@ export default function EnfermeroPage() {
   const [pacientes, setPacientes] = useState({});
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [aviso, setAviso] = useState('');
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
   const [registros, setRegistros] = useState([]);
 
-  // Trae turnos y pacientes al mismo tiempo
+  // Pide turnos y pacientes a la vez. Si uno falla, el otro se muestra igual.
   useEffect(() => {
-    Promise.all([obtenerTurnos(), obtenerUsuarios('patient')])
-      .then(([listaTurnos, listaPacientes]) => {
-        setTurnos(listaTurnos.filter((t) => t.status !== 'cancelled'));
+    Promise.allSettled([obtenerTurnos(), obtenerUsuarios('patient')])
+      .then(([resTurnos, resPacientes]) => {
+        if (resTurnos.status === 'fulfilled') {
+          setTurnos(resTurnos.value.filter((t) => t.status !== 'cancelled'));
+        } else {
+          setError(resTurnos.reason.message);
+        }
 
-        // Arma { u3: "Pablo Paciente", u4: "Lucía Gómez" } para la tabla
-        const mapa = {};
-        listaPacientes.forEach((p) => {
-          mapa[p._id] = `${p.first_name} ${p.last_name}`;
-        });
-        setPacientes(mapa);
+        if (resPacientes.status === 'fulfilled') {
+          // Arma { idPaciente: "Nombre Apellido" } para la tabla
+          const mapa = {};
+          resPacientes.value.forEach((p) => {
+            mapa[p._id] = `${p.first_name} ${p.last_name}`;
+          });
+          setPacientes(mapa);
+        } else {
+          setAviso(
+            'No se pudieron cargar los nombres de los pacientes. Los turnos se muestran igual.',
+          );
+        }
       })
-      .catch((err) => setError(err.message))
       .finally(() => setCargando(false));
   }, []);
 
@@ -58,6 +68,7 @@ export default function EnfermeroPage() {
       <h1>Turnos asignados</h1>
 
       {error && <p role="alert">{error}</p>}
+      {aviso && <p className="aviso">{aviso}</p>}
 
       {cargando ? (
         <p>Cargando turnos...</p>
@@ -74,7 +85,7 @@ export default function EnfermeroPage() {
       {turnoSeleccionado && (
         <section className="panel">
           <h2>
-            {pacientes[turnoSeleccionado.patient_id]} ·{' '}
+            {pacientes[turnoSeleccionado.patient_id] || 'Paciente'} ·{' '}
             {formatearFecha(turnoSeleccionado.date)} {turnoSeleccionado.hour}
           </h2>
           <p>Motivo: {turnoSeleccionado.motive}</p>

@@ -26,12 +26,13 @@ export default function UsuariosAdmin() {
       .finally(() => setCargando(false));
   }, []);
 
-  // Aplica búsqueda y filtro sobre la lista
+  // Aplica búsqueda (nombre, email o DNI) y filtro por rol
   const texto = busqueda.toLowerCase();
   const visibles = usuarios.filter((u) => {
     const coincideTexto =
       `${u.first_name} ${u.last_name}`.toLowerCase().includes(texto) ||
-      u.email.toLowerCase().includes(texto);
+      u.email.toLowerCase().includes(texto) ||
+      (u.dni || '').includes(texto);
     const coincideRol = !filtroRol || u.rol === filtroRol;
     return coincideTexto && coincideRol;
   });
@@ -71,7 +72,7 @@ export default function UsuariosAdmin() {
       <div className="filtros">
         <input
           type="search"
-          placeholder="Buscar por nombre o email"
+          placeholder="Buscar por nombre, email o DNI"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
