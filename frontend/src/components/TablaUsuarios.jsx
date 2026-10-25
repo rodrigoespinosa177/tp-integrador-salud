@@ -13,12 +13,16 @@ export default function TablaUsuarios({ usuarios, acciones }) {
             <th>Email</th>
             <th>Rol</th>
             <th>Teléfono</th>
+            <th>Estado</th>
             {acciones && <th>Acciones</th>}
           </tr>
         </thead>
         <tbody>
           {usuarios.map((u) => (
-            <tr key={u._id}>
+            <tr
+              key={u._id}
+              className={u.is_active === false ? 'inactivo' : undefined}
+            >
               <td>
                 {u.first_name} {u.last_name}
               </td>
@@ -26,6 +30,7 @@ export default function TablaUsuarios({ usuarios, acciones }) {
               <td>{u.email}</td>
               <td>{ETIQUETA_ROL[u.rol] || u.rol}</td>
               <td>{u.phone}</td>
+              <td>{u.is_active === false ? 'Inactivo' : 'Activo'}</td>
               {acciones && <td>{acciones(u)}</td>}
             </tr>
           ))}

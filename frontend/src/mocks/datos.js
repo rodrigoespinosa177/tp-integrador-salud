@@ -9,6 +9,7 @@ export const usuarios = [
     rol: 'administrator',
     phone: '2611111111',
     birthdate: '1990-05-10',
+    is_active: true,
   },
   {
     _id: 'u2',
@@ -20,6 +21,7 @@ export const usuarios = [
     rol: 'nurse',
     phone: '2612222222',
     birthdate: '1988-03-22',
+    is_active: true,
   },
   {
     _id: 'u3',
@@ -31,6 +33,7 @@ export const usuarios = [
     rol: 'patient',
     phone: '2613333333',
     birthdate: '2000-11-02',
+    is_active: true,
   },
   {
     _id: 'u4',
@@ -42,6 +45,19 @@ export const usuarios = [
     rol: 'patient',
     phone: '2614444444',
     birthdate: '1995-07-19',
+    is_active: true,
+  },
+  {
+    _id: 'u5',
+    first_name: 'Mario',
+    last_name: 'Inactivo',
+    dni: '30999000',
+    email: 'mario@test.com',
+    password: '123456',
+    rol: 'patient',
+    phone: '2615555555',
+    birthdate: '1985-01-30',
+    is_active: false,
   },
 ];
 

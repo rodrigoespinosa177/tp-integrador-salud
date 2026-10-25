@@ -1402,3 +1402,11 @@ td button + button {
     animation: none !important;
   }
 }
+
+tbody tr.inactivo td {
+  opacity: 0.55;
+}
+
+tbody tr.inactivo td:last-child {
+  opacity: 1;
+}
