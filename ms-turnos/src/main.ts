@@ -21,9 +21,12 @@ async function bootstrap() {
   // Documentación Swagger para el servicio de turnos
   const config = new DocumentBuilder()
     .setTitle('Microservicio de Turnos')
-    .setDescription('API REST para la gestión de turnos médicos (MedicalAppointment)')
+    .setDescription(
+      'API REST para la gestión de turnos médicos (MedicalAppointment) y sus signos y síntomas',
+    )
     .setVersion('1.0')
     .addTag('appointments', 'Gestión de turnos médicos')
+    .addTag('signs-and-symptoms', 'Signos y síntomas registrados por turno')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
