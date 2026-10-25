@@ -52,11 +52,12 @@ export default function FormularioSignos({ onGuardar }) {
       </label>
 
       <label>
-        Observaciones (opcional)
+        Observaciones
         <textarea
           name="observations"
           value={datos.observations}
           onChange={handleChange}
+          required
         />
       </label>
 

@@ -9,7 +9,7 @@ COPY . .
 # En Vite, las variables VITE_ se graban en el código al compilar,
 # por eso se pasan acá como argumentos de construcción
 ARG VITE_USE_MOCKS_USUARIOS=false
-ARG VITE_USE_MOCKS_TURNOS=true
+ARG VITE_USE_MOCKS_TURNOS: "false"
 ARG VITE_API_USUARIOS_URL=http://localhost:3000
 ARG VITE_API_TURNOS_URL=http://localhost:3000
 ENV VITE_USE_MOCKS_USUARIOS=$VITE_USE_MOCKS_USUARIOS \
