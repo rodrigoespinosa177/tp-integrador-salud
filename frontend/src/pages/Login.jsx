@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { RUTA_POR_ROL } from '../routes/rutasPorRol';
 import AuthLayout from '../components/AuthLayout';
 import CampoPassword from '../components/CampoPassword';
+import Tutorial from '../components/Tutorial';
+import { PASOS_TUTORIAL } from '../tutorial/pasos';
+import { yaSeVioLaGuia, marcarGuiaVista } from '../tutorial/guiaVista';
 
 export default function Login() {
   const { user, login } = useAuth();
@@ -11,6 +14,13 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
+  // La guía del login se muestra sola una vez por arranque de la app
+  const [guiaAbierta, setGuiaAbierta] = useState(() => !yaSeVioLaGuia('login'));
+
+  function cerrarGuia() {
+    setGuiaAbierta(false);
+    marcarGuiaVista('login');
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -65,7 +75,22 @@ export default function Login() {
           ¿Es tu primera vez?{' '}
           <Link to="/registro">Creá tu cuenta de paciente</Link>
         </p>
+
+        <p className="auth-ayuda">
+          ¿Necesitás ayuda?{' '}
+          <button
+            type="button"
+            className="boton-enlace auth-guia"
+            onClick={() => setGuiaAbierta(true)}
+          >
+            Ver la guía
+          </button>
+        </p>
       </form>
+
+      {guiaAbierta && (
+        <Tutorial pasos={PASOS_TUTORIAL.login} onCerrar={cerrarGuia} />
+      )}
     </AuthLayout>
   );
 }

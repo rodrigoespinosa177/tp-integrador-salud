@@ -6,27 +6,17 @@ import { RUTA_POR_ROL } from '../routes/rutasPorRol';
 import { PASOS_TUTORIAL } from '../tutorial/pasos';
 import Marca from './Marca';
 import Tutorial from './Tutorial';
-
-// La guía se muestra sola la primera vez que cada persona entra
-function claveTutorial(user) {
-  return `ambo-tutorial-visto-${user._id}`;
-}
-
-function yaVioElTutorial(user) {
-  try {
-    return localStorage.getItem(claveTutorial(user)) === 'si';
-  } catch {
-    return true;
-  }
-}
+import { yaSeVioLaGuia, marcarGuiaVista } from '../tutorial/guiaVista';
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const inicio = RUTA_POR_ROL[user.rol];
   const tienePerfil = user.rol === 'patient' || user.rol === 'nurse';
+  // La guía de cada persona se muestra sola una vez por arranque de la app
+  const claveGuia = `usuario-${user._id}`;
   const [tutorialAbierto, setTutorialAbierto] = useState(
-    () => !yaVioElTutorial(user),
+    () => !yaSeVioLaGuia(claveGuia),
   );
 
   function abrirTutorial() {
@@ -37,11 +27,7 @@ export default function Layout() {
 
   function cerrarTutorial() {
     setTutorialAbierto(false);
-    try {
-      localStorage.setItem(claveTutorial(user), 'si');
-    } catch {
-      // Si el navegador no deja guardar, la guía vuelve a aparecer la próxima vez
-    }
+    marcarGuiaVista(claveGuia);
   }
 
   return (

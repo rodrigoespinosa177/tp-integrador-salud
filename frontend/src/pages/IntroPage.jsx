@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RUTA_POR_ROL } from '../routes/rutasPorRol';
 import Marca from '../components/Marca';
 import TurnoDestacado from '../components/TurnoDestacado';
-
+import IntroAnimada from '../components/intro/IntroAnimada';
+import { debeMostrarseIntro } from '../components/intro/visibilidadIntro';
 // Fecha de ejemplo: siempre dos días después de hoy, para que el turno se vea a futuro
 function fechaDeEjemplo() {
   const d = new Date();
@@ -60,6 +62,9 @@ const ROLES = [
 
 export default function IntroPage() {
   const { user } = useAuth();
+  const [verPresentacion, setVerPresentacion] = useState(debeMostrarseIntro);
+
+  // Si ya inició sesión
 
   // Si ya inició sesión, va directo a su sección
   if (user) return <Navigate to={RUTA_POR_ROL[user.rol]} replace />;
@@ -138,8 +143,21 @@ export default function IntroPage() {
           <strong>AMBO</strong> es el trabajo integrador de Programación III del
           IES 9-023.
         </p>
-        <p>Hecho por Rodrigo Espinosa, Rubén Ledesma y Santiago Romano.</p>
+        <p>Hecho por Rubén Ledesma, Rodrigo Espinosa y Santiago Romano.</p>
+        <p>
+          <button
+            type="button"
+            className="intro-ver-presentacion"
+            onClick={() => setVerPresentacion(true)}
+          >
+            Ver la presentación de AMBO
+          </button>
+        </p>
       </footer>
+
+      {verPresentacion && (
+        <IntroAnimada onTerminar={() => setVerPresentacion(false)} />
+      )}
     </div>
   );
 }

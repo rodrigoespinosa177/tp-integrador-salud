@@ -1,6 +1,47 @@
 // Pasos de la guía de cada rol.
 // "selector" indica qué parte de la pantalla se resalta en cada paso.
 export const PASOS_TUTORIAL = {
+  login: [
+    {
+      selector: '.auth-form h1',
+      titulo: 'Te damos la bienvenida a AMBO',
+      texto:
+        'Desde acá entrás a tu cuenta para ver y pedir turnos del centro de salud.',
+    },
+    {
+      selector: '.auth-recorrido',
+      titulo: 'Cómo funciona un turno',
+      texto:
+        'Lo pedís, el centro lo confirma y enfermería te atiende. En AMBO ves cada paso.',
+    },
+    {
+      selector: '.auth-form > label',
+      titulo: 'Tu email',
+      texto: 'Escribí el email con el que creaste tu cuenta.',
+    },
+    {
+      selector: '.campo-password',
+      titulo: 'Tu contraseña',
+      texto: 'Tocá el ojo para ver lo que escribiste y revisar que esté bien.',
+    },
+    {
+      selector: '.auth-form button[type="submit"]',
+      titulo: 'Ingresar',
+      texto:
+        'Te lleva directo a tu sección: paciente, enfermería o administración.',
+    },
+    {
+      selector: '.auth-pie',
+      titulo: '¿Primera vez?',
+      texto:
+        'Si sos paciente y todavía no tenés cuenta, la creás acá en un minuto.',
+    },
+    {
+      selector: '.auth-guia',
+      titulo: 'Volver a ver la guía',
+      texto: 'Si te olvidás de algo, tocá Ver la guía y arranca de nuevo.',
+    },
+  ],
   patient: [
     {
       selector: '.pagina-encabezado',

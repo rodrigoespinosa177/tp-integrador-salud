@@ -38,6 +38,8 @@ export default function Tutorial({ pasos, onCerrar }) {
 
     function buscar() {
       elemento = document.querySelector(paso.selector);
+      // Si existe pero está oculto (por ejemplo, en el celular), cuenta como que no está
+      if (elemento && elemento.getClientRects().length === 0) elemento = null;
       if (elemento) {
         elemento.scrollIntoView({ block: 'center' });
         requestAnimationFrame(medir);

@@ -1012,6 +1012,39 @@ td button + button {
   gap: 0.25rem;
 }
 
+/* Botón con aspecto de enlace (por ejemplo, "Ver la guía" en el login) */
+.boton-enlace {
+  min-height: auto;
+  padding: 0.15rem 0.2rem;
+  background: transparent;
+  color: var(--azul);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.boton-enlace:hover:not(:disabled) {
+  background: transparent;
+  color: var(--azul-hover);
+}
+
+/* Botón con aspecto de enlace, para volver a ver la presentación */
+.intro-ver-presentacion {
+  min-height: auto;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  color: var(--azul);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.intro-ver-presentacion:hover:not(:disabled) {
+  background: transparent;
+  color: var(--azul-hover);
+}
+
 /* =========================================================
    Guía paso a paso (tutorial)
    ========================================================= */
