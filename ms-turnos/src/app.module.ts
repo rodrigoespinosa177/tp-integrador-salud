@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { SignsAndSymptomsModule } from './signs-and-symptoms/signs-and-symptoms.module';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
     }),
 
     AppointmentsModule,
-    // Pendiente: SignosSintomasModule
+    SignsAndSymptomsModule,
   ],
 })
 export class AppModule {}
