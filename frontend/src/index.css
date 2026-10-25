@@ -1,58 +1,56 @@
 /* =========================================================
-   Paleta inspirada en los colores de uniformes sanitarios
+   Sistema visual — Turnos de Salud
+   Tipografía: Atkinson Hyperlegible Next (Braille Institute),
+   pensada para leerse bien con baja visión.
+   Colores: los de los uniformes sanitarios, cada uno con un
+   significado fijo.
    ========================================================= */
 :root {
-  /* Azul: color principal */
-  --azul: #1f6fb2;
-  --azul-hover: #185a91;
-  --azul-suave: #e4f1fb;
+  /* Azul: marca y acciones principales */
+  --azul: #1d5fa6;
+  --azul-hover: #174d88;
+  --azul-profundo: #123c6b;
+  --azul-suave: #e6f0fa;
 
-  /* Verde: éxito, atendido */
-  --verde: #2e8b57;
-  --verde-suave: #e3f4ea;
+  /* Estados del turno */
+  --verde: #23784a; /* atendido, éxito */
+  --verde-suave: #e2f3e9;
+  --amarillo: #e9b323; /* pendiente */
+  --amarillo-texto: #7a5300;
+  --amarillo-suave: #fdf3d4;
+  --rosa: #e48aa6; /* solo en la marca */
+  --rojo: #c4321f; /* cancelar, errores */
+  --rojo-hover: #f9d3cd;
+  --rojo-suave: #fce9e6;
 
-  /* Amarillo: pendiente */
-  --amarillo: #f4c430;
-  --amarillo-texto: #8a6100;
-  --amarillo-suave: #fff6d6;
-
-  /* Rosa: acento decorativo */
-  --rosa: #e88aa8;
-
-  /* Rojo: errores y acciones peligrosas */
-  --rojo: #d92d20;
-  --rojo-hover: #fbd5d1;
-  --rojo-suave: #fde8e6;
-
-  /* Neutros */
-  --fondo: #f3f7fa;
+  /* Neutros con un tinte azul, como el papel de una historia clínica */
+  --fondo: #f2f5f8;
   --superficie: #ffffff;
-  --borde: #d9e3ea;
-  --texto: #1b2a36;
-  --texto-suave: #5a6b78;
+  --borde: #d5dfe8;
+  --borde-fuerte: #b7c6d4;
+  --texto: #172538;
+  --texto-suave: #536476;
 
+  --radio-chico: 8px;
   --radio: 12px;
-  --sombra: 0 1px 2px rgba(16, 24, 40, 0.05), 0 2px 8px rgba(16, 24, 40, 0.06);
+  --radio-grande: 18px;
+  --sombra: 0 1px 2px rgba(23, 37, 56, 0.06), 0 4px 14px rgba(23, 37, 56, 0.05);
 
-  /* Franja con los 5 colores */
-  --franja: linear-gradient(
-    90deg,
-    var(--azul) 0 20%,
-    var(--verde) 20% 40%,
-    var(--amarillo) 40% 60%,
-    var(--rosa) 60% 80%,
-    var(--rojo) 80% 100%
-  );
+  /* Escala tipográfica (base 17 px, un poco más grande de lo habitual) */
+  --texto-chico: 0.875rem;
+  --texto-base: 1.0625rem;
+  --titulo-3: 1.1875rem;
+  --titulo-2: 1.4375rem;
+  --titulo-1: 1.875rem;
 
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  /* Alto mínimo de botones y campos: fácil de tocar con el dedo */
+  --alto-toque: 2.75rem;
+
+  font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  font-size: var(--texto-base);
   color: var(--texto);
   background: var(--fondo);
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -67,31 +65,92 @@ body {
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 1.6rem;
+h1,
+h2,
+h3 {
   margin: 0;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: var(--titulo-1);
   letter-spacing: -0.01em;
 }
 h2 {
-  font-size: 1.25rem;
-  margin: 0;
+  font-size: var(--titulo-2);
 }
 h3 {
-  font-size: 1.05rem;
-  margin: 0;
+  font-size: var(--titulo-3);
 }
 p {
   margin: 0;
+}
+
+a {
+  color: var(--azul);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+/* Foco visible para quien navega con teclado */
+:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   Marca: las cinco barras de colores de los uniformes
+   ========================================================= */
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--texto);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  white-space: nowrap;
+}
+
+.marca-barras {
+  display: inline-flex;
+  gap: 3px;
+  height: 1.5rem;
+  align-items: flex-end;
+}
+
+.marca-barras span {
+  width: 5px;
+  border-radius: 3px;
+}
+
+.marca-barras span:nth-child(1) {
+  height: 60%;
+  background: var(--azul);
+}
+.marca-barras span:nth-child(2) {
+  height: 100%;
+  background: var(--verde);
+}
+.marca-barras span:nth-child(3) {
+  height: 75%;
+  background: var(--amarillo);
+}
+.marca-barras span:nth-child(4) {
+  height: 90%;
+  background: var(--rosa);
+}
+.marca-barras span:nth-child(5) {
+  height: 55%;
+  background: var(--rojo);
 }
 
 /* =========================================================
    Encabezado
    ========================================================= */
 .encabezado {
-  /* Franja de colores arriba + fondo blanco */
-  background:
-    var(--franja) top / 100% 4px no-repeat,
-    var(--superficie);
+  background: var(--superficie);
   border-bottom: 1px solid var(--borde);
   position: sticky;
   top: 0;
@@ -99,13 +158,12 @@ p {
 }
 
 .encabezado-contenido {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 0.9rem 1rem 0.75rem;
+  padding: 0.7rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 1.5rem;
 }
 
 .menu {
@@ -116,12 +174,12 @@ p {
 .menu a {
   color: var(--texto-suave);
   text-decoration: none;
-  padding: 0.4rem 0.85rem;
-  border-radius: 999px;
-  font-weight: 500;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  font-weight: 600;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radio-chico);
+  min-height: var(--alto-toque);
+  display: inline-flex;
+  align-items: center;
 }
 
 .menu a:hover {
@@ -131,28 +189,44 @@ p {
 
 /* NavLink le agrega la clase "active" a la página actual */
 .menu a.active {
-  background: var(--azul-suave);
   color: var(--azul);
+  background: var(--azul-suave);
 }
 
-.usuario {
+.sesion {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.sesion-datos {
+  display: grid;
+  text-align: right;
+  line-height: 1.25;
+}
+
+.sesion-nombre {
+  font-weight: 700;
+}
+
+.sesion-rol {
+  font-size: var(--texto-chico);
   color: var(--texto-suave);
-  font-size: 0.9rem;
 }
 
 /* =========================================================
    Contenido
    ========================================================= */
 .contenido {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 1.75rem 1rem 3rem;
+  padding: 2rem 1.25rem 4rem;
 }
 
 .contenido section {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
   /* La columna nunca supera el ancho disponible */
   grid-template-columns: minmax(0, 1fr);
 }
@@ -165,9 +239,9 @@ form {
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
-  padding: 1.25rem;
+  padding: 1.5rem;
   display: grid;
-  gap: 0.9rem;
+  gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
@@ -185,10 +259,10 @@ form button {
 
 label {
   display: grid;
-  gap: 0.35rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--texto-suave);
+  gap: 0.4rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--texto);
 }
 
 input,
@@ -196,14 +270,21 @@ select,
 textarea {
   font: inherit;
   width: 100%;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid var(--borde);
-  border-radius: 8px;
+  min-height: var(--alto-toque);
+  padding: 0.55rem 0.8rem;
+  border: 1.5px solid var(--borde-fuerte);
+  border-radius: var(--radio-chico);
   background: #fff;
   color: var(--texto);
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--texto-suave);
 }
 
 input:focus,
@@ -215,7 +296,7 @@ textarea:focus {
 }
 
 textarea {
-  min-height: 80px;
+  min-height: 96px;
   resize: vertical;
 }
 
@@ -224,24 +305,19 @@ textarea {
    ========================================================= */
 button {
   font: inherit;
-  font-weight: 600;
+  font-weight: 700;
+  min-height: var(--alto-toque);
   border: none;
-  border-radius: 8px;
-  padding: 0.55rem 1rem;
+  border-radius: var(--radio-chico);
+  padding: 0.55rem 1.15rem;
   background: var(--azul);
   color: #fff;
   cursor: pointer;
-  transition:
-    background 0.15s,
-    transform 0.05s;
+  transition: background 0.15s;
 }
 
 button:hover:not(:disabled) {
   background: var(--azul-hover);
-}
-
-button:active:not(:disabled) {
-  transform: translateY(1px);
 }
 
 button:disabled {
@@ -249,15 +325,10 @@ button:disabled {
   cursor: not-allowed;
 }
 
-button:focus-visible {
-  outline: 3px solid var(--azul-suave);
-  outline-offset: 2px;
-}
-
 button.secundario {
   background: var(--superficie);
   color: var(--texto);
-  border: 1px solid var(--borde);
+  border: 1.5px solid var(--borde-fuerte);
 }
 
 button.secundario:hover:not(:disabled) {
@@ -280,25 +351,26 @@ button.peligro:hover:not(:disabled) {
   background: var(--rojo-suave);
   color: var(--rojo);
   border-left: 4px solid var(--rojo);
-  padding: 0.6rem 0.85rem;
-  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-chico);
 }
 
 [role='status'] {
   background: var(--verde-suave);
   color: var(--verde);
   border-left: 4px solid var(--verde);
-  padding: 0.6rem 0.85rem;
-  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-chico);
 }
 
 .aviso {
   background: var(--amarillo-suave);
   color: var(--amarillo-texto);
   border-left: 4px solid var(--amarillo);
-  padding: 0.6rem 0.85rem;
-  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-chico);
 }
+
 /* =========================================================
    Tablas
    ========================================================= */
@@ -313,23 +385,21 @@ button.peligro:hover:not(:disabled) {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
 }
 
 th,
 td {
-  padding: 0.75rem 1rem;
+  padding: 0.8rem 1rem;
   text-align: left;
   border-bottom: 1px solid var(--borde);
   white-space: nowrap;
 }
 
 th {
-  background: var(--azul-suave);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--azul);
+  font-size: var(--texto-chico);
+  font-weight: 700;
+  color: var(--texto-suave);
+  background: var(--fondo);
 }
 
 tbody tr:last-child td {
@@ -337,12 +407,13 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #f8fbfd;
+  background: #f8fafc;
 }
 
 td button {
-  padding: 0.3rem 0.75rem;
-  font-size: 0.85rem;
+  min-height: 2.25rem;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.9375rem;
 }
 
 td button + button {
@@ -355,18 +426,18 @@ td button + button {
 .estado {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.15rem 0.65rem;
+  gap: 0.4rem;
+  padding: 0.2rem 0.7rem;
   border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
-/* Puntito de color antes del texto */
+/* Puntito de color: el estado no depende solo del texto */
 .estado::before {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: currentColor;
 }
@@ -384,8 +455,8 @@ td button + button {
   color: var(--verde);
 }
 .estado-cancelled {
-  background: #eef1f4;
-  color: #5a6b78;
+  background: #edf0f3;
+  color: var(--texto-suave);
 }
 
 /* =========================================================
@@ -398,12 +469,12 @@ td button + button {
 }
 
 .filtros input {
-  flex: 1 1 240px;
+  flex: 1 1 260px;
   width: auto;
   min-width: 0;
 }
 .filtros select {
-  flex: 0 1 200px;
+  flex: 0 1 220px;
   width: auto;
   min-width: 0;
 }
@@ -411,17 +482,16 @@ td button + button {
 .pestanias {
   display: flex;
   gap: 0.25rem;
-  padding: 0.25rem;
+  padding: 0.3rem;
   background: var(--superficie);
   border: 1px solid var(--borde);
-  border-radius: 10px;
+  border-radius: var(--radio);
   justify-self: start;
 }
 
 .pestanias button {
   background: transparent;
   color: var(--texto-suave);
-  padding: 0.45rem 1rem;
 }
 
 .pestanias button:hover:not(:disabled) {
@@ -439,10 +509,9 @@ td button + button {
 .panel {
   background: var(--superficie);
   border: 1px solid var(--borde);
-  border-top: 4px solid var(--verde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
-  padding: 1.25rem;
+  padding: 1.5rem;
 }
 
 .panel form {
@@ -466,98 +535,188 @@ td button + button {
 .lista-signos li {
   border-left: 4px solid var(--verde);
   background: var(--verde-suave);
-  padding: 0.75rem 1rem;
-  border-radius: 0 8px 8px 0;
+  padding: 0.8rem 1rem;
+  border-radius: 0 var(--radio-chico) var(--radio-chico) 0;
   display: grid;
   gap: 0.2rem;
 }
 
 /* =========================================================
-   Login
+   Login y registro: pantalla dividida
    ========================================================= */
-.login-pagina {
+.auth {
   min-height: 100vh;
   display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+}
+
+.auth-lateral {
+  background: var(--azul-profundo);
+  color: #fff;
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2.5rem;
+}
+
+.auth-lateral .marca {
+  color: #fff;
+}
+
+.auth-lema {
+  font-size: 2.125rem;
+  line-height: 1.2;
+  font-weight: 700;
+  max-width: 16ch;
+}
+
+/* El recorrido de un turno, como pasos en orden */
+.auth-recorrido {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.1rem;
+  max-width: 34ch;
+}
+
+.auth-recorrido li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  color: #d6e4f3;
+}
+
+.auth-recorrido strong {
+  display: block;
+  color: #fff;
+}
+
+.auth-paso {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: grid;
   place-items: center;
-  padding: 1rem;
-  background:
-    radial-gradient(circle at 15% 20%, var(--azul-suave) 0, transparent 40%),
-    radial-gradient(circle at 85% 80%, var(--verde-suave) 0, transparent 40%),
-    var(--fondo);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--azul-profundo);
 }
 
-.login {
-  width: min(400px, 100%);
+.auth-recorrido li:nth-child(1) .auth-paso {
+  background: var(--amarillo);
+}
+.auth-recorrido li:nth-child(2) .auth-paso {
+  background: #9cc6ee;
+}
+.auth-recorrido li:nth-child(3) .auth-paso {
+  background: #8fd3ab;
+}
+
+.auth-principal {
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.auth-form {
+  width: min(440px, 100%);
   grid-template-columns: 1fr;
-  padding: 2.25rem 2rem 2rem;
-  /* Franja de colores arriba de la tarjeta */
-  background:
-    var(--franja) top / 100% 6px no-repeat,
-    var(--superficie);
-  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.1);
+  gap: 1.1rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
-.login h1 {
-  text-align: center;
-  margin-bottom: 0.25rem;
+.auth-form h1 {
+  margin-bottom: -0.25rem;
 }
 
-.login button[type='submit'] {
-  padding: 0.7rem 1rem;
-}
-
-.login-subtitulo {
-  text-align: center;
-  color: var(--texto-suave);
-  font-size: 0.9rem;
-  margin-top: -0.5rem;
-}
-
-.login-pie {
-  text-align: center;
-  font-size: 0.9rem;
+.auth-ayuda {
   color: var(--texto-suave);
 }
 
-.login-pie a {
-  color: var(--azul);
-  font-weight: 600;
-  text-decoration: none;
+.auth-form button[type='submit'] {
+  min-height: 3rem;
+  margin-top: 0.25rem;
 }
 
-.login-pie a:hover {
-  text-decoration: underline;
+.auth-pie {
+  color: var(--texto-suave);
+}
+
+/* Nombre y apellido lado a lado en el registro */
+.auth-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 /* =========================================================
-   Celular
+   Celular y tablet
    ========================================================= */
+@media (max-width: 860px) {
+  .auth {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .auth-lateral {
+    padding: 1.25rem 1.5rem 1.5rem;
+    gap: 1rem;
+    justify-content: flex-start;
+  }
+
+  .auth-principal {
+    place-items: start center;
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-lema {
+    font-size: 1.5rem;
+    max-width: none;
+  }
+
+  /* En pantallas chicas el recorrido se oculta: primero el formulario */
+  .auth-recorrido {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   h1 {
-    font-size: 1.35rem;
+    font-size: 1.5rem;
   }
 
   .contenido {
-    padding: 1rem 0.75rem 2rem;
+    padding: 1.25rem 1rem 2.5rem;
   }
 
   form {
-    padding: 1rem;
+    padding: 1.1rem;
   }
 
-  .login {
-    padding: 2rem 1.25rem 1.5rem;
+  .encabezado-contenido {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding: 0.6rem 1rem;
   }
 
-  /* El nombre del usuario baja a una segunda línea */
-  .encabezado-contenido > button {
-    margin-left: auto;
-    order: 2;
+  /* En el encabezado del celular, el logo queda solo con las barras */
+  .encabezado .marca-texto {
+    display: none;
   }
-  .usuario {
+
+  .menu {
     order: 3;
     width: 100%;
-    margin-left: 0;
+  }
+
+  .sesion-datos {
+    display: none;
   }
 
   .pestanias {
@@ -565,5 +724,17 @@ td button + button {
   }
   .pestanias button {
     flex: 1;
+  }
+
+  .auth-fila {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Respeta la opción "reducir movimiento" del sistema */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
   }
 }

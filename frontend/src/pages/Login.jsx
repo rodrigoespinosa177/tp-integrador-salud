@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RUTA_POR_ROL } from '../routes/rutasPorRol';
+import AuthLayout from '../components/AuthLayout';
 
 export default function Login() {
   const { user, login } = useAuth();
@@ -27,14 +28,18 @@ export default function Login() {
   if (user) return <Navigate to={RUTA_POR_ROL[user.rol]} replace />;
 
   return (
-    <div className="login-pagina">
-      <form className="login" onSubmit={handleSubmit}>
+    <AuthLayout>
+      <form className="auth-form" onSubmit={handleSubmit}>
         <h1>Iniciar sesión</h1>
+        <p className="auth-ayuda">
+          Ingresá con el email y la contraseña de tu cuenta.
+        </p>
 
         <label>
           Email
           <input
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -45,6 +50,7 @@ export default function Login() {
           Contraseña
           <input
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -56,10 +62,12 @@ export default function Login() {
         <button type="submit" disabled={cargando}>
           {cargando ? 'Ingresando...' : 'Ingresar'}
         </button>
-        <p className="login-pie">
-          ¿No tenés cuenta? <Link to="/registro">Registrate</Link>
+
+        <p className="auth-pie">
+          ¿Es tu primera vez?{' '}
+          <Link to="/registro">Creá tu cuenta de paciente</Link>
         </p>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
