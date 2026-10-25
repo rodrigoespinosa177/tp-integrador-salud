@@ -23,7 +23,12 @@ export default function EnfermeroPage() {
     Promise.allSettled([obtenerTurnos(), obtenerUsuarios('patient')])
       .then(([resTurnos, resPacientes]) => {
         if (resTurnos.status === 'fulfilled') {
-          setTurnos(resTurnos.value.filter((t) => t.status !== 'cancelled'));
+          // El enfermero atiende los confirmados y consulta los ya atendidos
+          setTurnos(
+            resTurnos.value.filter(
+              (t) => t.status === 'confirmed' || t.status === 'completed',
+            ),
+          );
         } else {
           setError(resTurnos.reason.message);
         }
@@ -61,6 +66,14 @@ export default function EnfermeroPage() {
       nurse_id: user._id,
     });
     setRegistros((prev) => [...prev, nuevo]);
+
+    // El back pasa el turno a "atendido": lo reflejamos en la tabla y en el panel
+    setTurnos((prev) =>
+      prev.map((t) =>
+        t._id === turnoSeleccionado._id ? { ...t, status: 'completed' } : t,
+      ),
+    );
+    setTurnoSeleccionado((prev) => ({ ...prev, status: 'completed' }));
   }
 
   return (

@@ -1,58 +1,56 @@
 /* =========================================================
-   Paleta inspirada en los colores de uniformes sanitarios
+   Sistema visual — Turnos de Salud
+   Tipografía: Atkinson Hyperlegible Next (Braille Institute),
+   pensada para leerse bien con baja visión.
+   Colores: los de los uniformes sanitarios, cada uno con un
+   significado fijo.
    ========================================================= */
 :root {
-  /* Azul: color principal */
-  --azul: #1f6fb2;
-  --azul-hover: #185a91;
-  --azul-suave: #e4f1fb;
+  /* Azul: marca y acciones principales */
+  --azul: #1d5fa6;
+  --azul-hover: #174d88;
+  --azul-profundo: #123c6b;
+  --azul-suave: #e6f0fa;
 
-  /* Verde: éxito, atendido */
-  --verde: #2e8b57;
-  --verde-suave: #e3f4ea;
+  /* Estados del turno */
+  --verde: #23784a; /* atendido, éxito */
+  --verde-suave: #e2f3e9;
+  --amarillo: #e9b323; /* pendiente */
+  --amarillo-texto: #7a5300;
+  --amarillo-suave: #fdf3d4;
+  --rosa: #e48aa6; /* solo en la marca */
+  --rojo: #c4321f; /* cancelar, errores */
+  --rojo-hover: #f9d3cd;
+  --rojo-suave: #fce9e6;
 
-  /* Amarillo: pendiente */
-  --amarillo: #f4c430;
-  --amarillo-texto: #8a6100;
-  --amarillo-suave: #fff6d6;
-
-  /* Rosa: acento decorativo */
-  --rosa: #e88aa8;
-
-  /* Rojo: errores y acciones peligrosas */
-  --rojo: #d92d20;
-  --rojo-hover: #fbd5d1;
-  --rojo-suave: #fde8e6;
-
-  /* Neutros */
-  --fondo: #f3f7fa;
+  /* Neutros con un tinte azul, como el papel de una historia clínica */
+  --fondo: #f2f5f8;
   --superficie: #ffffff;
-  --borde: #d9e3ea;
-  --texto: #1b2a36;
-  --texto-suave: #5a6b78;
+  --borde: #d5dfe8;
+  --borde-fuerte: #b7c6d4;
+  --texto: #172538;
+  --texto-suave: #536476;
 
+  --radio-chico: 8px;
   --radio: 12px;
-  --sombra: 0 1px 2px rgba(16, 24, 40, 0.05), 0 2px 8px rgba(16, 24, 40, 0.06);
+  --radio-grande: 18px;
+  --sombra: 0 1px 2px rgba(23, 37, 56, 0.06), 0 4px 14px rgba(23, 37, 56, 0.05);
 
-  /* Franja con los 5 colores */
-  --franja: linear-gradient(
-    90deg,
-    var(--azul) 0 20%,
-    var(--verde) 20% 40%,
-    var(--amarillo) 40% 60%,
-    var(--rosa) 60% 80%,
-    var(--rojo) 80% 100%
-  );
+  /* Escala tipográfica (base 17 px, un poco más grande de lo habitual) */
+  --texto-chico: 0.875rem;
+  --texto-base: 1.0625rem;
+  --titulo-3: 1.1875rem;
+  --titulo-2: 1.4375rem;
+  --titulo-1: 1.875rem;
 
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  /* Alto mínimo de botones y campos: fácil de tocar con el dedo */
+  --alto-toque: 2.75rem;
+
+  font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  font-size: var(--texto-base);
   color: var(--texto);
   background: var(--fondo);
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -67,31 +65,93 @@ body {
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 1.6rem;
+h1,
+h2,
+h3 {
   margin: 0;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: var(--titulo-1);
   letter-spacing: -0.01em;
 }
 h2 {
-  font-size: 1.25rem;
-  margin: 0;
+  font-size: var(--titulo-2);
 }
 h3 {
-  font-size: 1.05rem;
-  margin: 0;
+  font-size: var(--titulo-3);
 }
 p {
   margin: 0;
+}
+
+a {
+  color: var(--azul);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+/* Foco visible para quien navega con teclado */
+:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   Marca: las cinco barras de colores de los uniformes
+   ========================================================= */
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--texto);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.marca-barras {
+  display: inline-flex;
+  gap: 3px;
+  height: 1.5rem;
+  align-items: flex-end;
+}
+
+.marca-barras span {
+  width: 5px;
+  border-radius: 3px;
+}
+
+.marca-barras span:nth-child(1) {
+  height: 60%;
+  background: var(--azul);
+}
+.marca-barras span:nth-child(2) {
+  height: 100%;
+  background: var(--verde);
+}
+.marca-barras span:nth-child(3) {
+  height: 75%;
+  background: var(--amarillo);
+}
+.marca-barras span:nth-child(4) {
+  height: 90%;
+  background: var(--rosa);
+}
+.marca-barras span:nth-child(5) {
+  height: 55%;
+  background: var(--rojo);
 }
 
 /* =========================================================
    Encabezado
    ========================================================= */
 .encabezado {
-  /* Franja de colores arriba + fondo blanco */
-  background:
-    var(--franja) top / 100% 4px no-repeat,
-    var(--superficie);
+  background: var(--superficie);
   border-bottom: 1px solid var(--borde);
   position: sticky;
   top: 0;
@@ -99,13 +159,12 @@ p {
 }
 
 .encabezado-contenido {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 0.9rem 1rem 0.75rem;
+  padding: 0.7rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 1.5rem;
 }
 
 .menu {
@@ -116,12 +175,12 @@ p {
 .menu a {
   color: var(--texto-suave);
   text-decoration: none;
-  padding: 0.4rem 0.85rem;
-  border-radius: 999px;
-  font-weight: 500;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  font-weight: 600;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radio-chico);
+  min-height: var(--alto-toque);
+  display: inline-flex;
+  align-items: center;
 }
 
 .menu a:hover {
@@ -131,28 +190,44 @@ p {
 
 /* NavLink le agrega la clase "active" a la página actual */
 .menu a.active {
-  background: var(--azul-suave);
   color: var(--azul);
+  background: var(--azul-suave);
 }
 
-.usuario {
+.sesion {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.sesion-datos {
+  display: grid;
+  text-align: right;
+  line-height: 1.25;
+}
+
+.sesion-nombre {
+  font-weight: 700;
+}
+
+.sesion-rol {
+  font-size: var(--texto-chico);
   color: var(--texto-suave);
-  font-size: 0.9rem;
 }
 
 /* =========================================================
    Contenido
    ========================================================= */
 .contenido {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 1.75rem 1rem 3rem;
+  padding: 2rem 1.25rem 4rem;
 }
 
 .contenido section {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
   /* La columna nunca supera el ancho disponible */
   grid-template-columns: minmax(0, 1fr);
 }
@@ -165,9 +240,9 @@ form {
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
-  padding: 1.25rem;
+  padding: 1.5rem;
   display: grid;
-  gap: 0.9rem;
+  gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
@@ -185,10 +260,10 @@ form button {
 
 label {
   display: grid;
-  gap: 0.35rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--texto-suave);
+  gap: 0.4rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--texto);
 }
 
 input,
@@ -196,14 +271,21 @@ select,
 textarea {
   font: inherit;
   width: 100%;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid var(--borde);
-  border-radius: 8px;
+  min-height: var(--alto-toque);
+  padding: 0.55rem 0.8rem;
+  border: 1.5px solid var(--borde-fuerte);
+  border-radius: var(--radio-chico);
   background: #fff;
   color: var(--texto);
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--texto-suave);
 }
 
 input:focus,
@@ -215,33 +297,61 @@ textarea:focus {
 }
 
 textarea {
-  min-height: 80px;
+  min-height: 96px;
   resize: vertical;
 }
 
+/* Campo de contraseña con el botón del ojo adentro */
+.campo-password {
+  position: relative;
+  display: block;
+}
+
+.campo-password input {
+  padding-right: 3rem;
+}
+
+.ver-password {
+  position: absolute;
+  top: 50%;
+  right: 0.2rem;
+  transform: translateY(-50%);
+  width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--texto-suave);
+}
+
+.ver-password:hover:not(:disabled) {
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+.ver-password svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
 /* =========================================================
    Botones
    ========================================================= */
 button {
   font: inherit;
-  font-weight: 600;
+  font-weight: 700;
+  min-height: var(--alto-toque);
   border: none;
-  border-radius: 8px;
-  padding: 0.55rem 1rem;
+  border-radius: var(--radio-chico);
+  padding: 0.55rem 1.15rem;
   background: var(--azul);
   color: #fff;
   cursor: pointer;
-  transition:
-    background 0.15s,
-    transform 0.05s;
+  transition: background 0.15s;
 }
 
 button:hover:not(:disabled) {
   background: var(--azul-hover);
-}
-
-button:active:not(:disabled) {
-  transform: translateY(1px);
 }
 
 button:disabled {
@@ -249,15 +359,10 @@ button:disabled {
   cursor: not-allowed;
 }
 
-button:focus-visible {
-  outline: 3px solid var(--azul-suave);
-  outline-offset: 2px;
-}
-
 button.secundario {
   background: var(--superficie);
   color: var(--texto);
-  border: 1px solid var(--borde);
+  border: 1.5px solid var(--borde-fuerte);
 }
 
 button.secundario:hover:not(:disabled) {
@@ -280,25 +385,26 @@ button.peligro:hover:not(:disabled) {
   background: var(--rojo-suave);
   color: var(--rojo);
   border-left: 4px solid var(--rojo);
-  padding: 0.6rem 0.85rem;
-  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-chico);
 }
 
 [role='status'] {
   background: var(--verde-suave);
   color: var(--verde);
   border-left: 4px solid var(--verde);
-  padding: 0.6rem 0.85rem;
-  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-chico);
 }
 
 .aviso {
   background: var(--amarillo-suave);
   color: var(--amarillo-texto);
   border-left: 4px solid var(--amarillo);
-  padding: 0.6rem 0.85rem;
-  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-chico);
 }
+
 /* =========================================================
    Tablas
    ========================================================= */
@@ -313,23 +419,21 @@ button.peligro:hover:not(:disabled) {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
 }
 
 th,
 td {
-  padding: 0.75rem 1rem;
+  padding: 0.8rem 1rem;
   text-align: left;
   border-bottom: 1px solid var(--borde);
   white-space: nowrap;
 }
 
 th {
-  background: var(--azul-suave);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--azul);
+  font-size: var(--texto-chico);
+  font-weight: 700;
+  color: var(--texto-suave);
+  background: var(--fondo);
 }
 
 tbody tr:last-child td {
@@ -337,12 +441,13 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #f8fbfd;
+  background: #f8fafc;
 }
 
 td button {
-  padding: 0.3rem 0.75rem;
-  font-size: 0.85rem;
+  min-height: 2.25rem;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.9375rem;
 }
 
 td button + button {
@@ -355,18 +460,18 @@ td button + button {
 .estado {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.15rem 0.65rem;
+  gap: 0.4rem;
+  padding: 0.2rem 0.7rem;
   border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
-/* Puntito de color antes del texto */
+/* Puntito de color: el estado no depende solo del texto */
 .estado::before {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: currentColor;
 }
@@ -384,8 +489,8 @@ td button + button {
   color: var(--verde);
 }
 .estado-cancelled {
-  background: #eef1f4;
-  color: #5a6b78;
+  background: #edf0f3;
+  color: var(--texto-suave);
 }
 
 /* =========================================================
@@ -398,12 +503,12 @@ td button + button {
 }
 
 .filtros input {
-  flex: 1 1 240px;
+  flex: 1 1 260px;
   width: auto;
   min-width: 0;
 }
 .filtros select {
-  flex: 0 1 200px;
+  flex: 0 1 220px;
   width: auto;
   min-width: 0;
 }
@@ -411,17 +516,16 @@ td button + button {
 .pestanias {
   display: flex;
   gap: 0.25rem;
-  padding: 0.25rem;
+  padding: 0.3rem;
   background: var(--superficie);
   border: 1px solid var(--borde);
-  border-radius: 10px;
+  border-radius: var(--radio);
   justify-self: start;
 }
 
 .pestanias button {
   background: transparent;
   color: var(--texto-suave);
-  padding: 0.45rem 1rem;
 }
 
 .pestanias button:hover:not(:disabled) {
@@ -439,10 +543,9 @@ td button + button {
 .panel {
   background: var(--superficie);
   border: 1px solid var(--borde);
-  border-top: 4px solid var(--verde);
   border-radius: var(--radio);
   box-shadow: var(--sombra);
-  padding: 1.25rem;
+  padding: 1.5rem;
 }
 
 .panel form {
@@ -466,98 +569,762 @@ td button + button {
 .lista-signos li {
   border-left: 4px solid var(--verde);
   background: var(--verde-suave);
-  padding: 0.75rem 1rem;
-  border-radius: 0 8px 8px 0;
+  padding: 0.8rem 1rem;
+  border-radius: 0 var(--radio-chico) var(--radio-chico) 0;
   display: grid;
   gap: 0.2rem;
 }
 
 /* =========================================================
-   Login
+   Páginas internas
    ========================================================= */
-.login-pagina {
+.contenido section.pagina {
+  gap: 1.75rem;
+}
+
+.pagina-encabezado {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.pagina-encabezado p {
+  color: var(--texto-suave);
+}
+
+.bloque {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/* Estado vacío: invita a hacer algo, no solo informa */
+.vacio {
+  border: 2px dashed var(--borde-fuerte);
+  border-radius: var(--radio-grande);
+  padding: 1.75rem;
+  display: grid;
+  gap: 0.35rem;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+.vacio h2 {
+  font-size: var(--titulo-3);
+  color: var(--texto);
+}
+
+/* =========================================================
+   Próximo turno: comprobante con troquel
+   ========================================================= */
+.turno-destacado {
+  --ancho-talon: 8rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--ancho-talon) 1fr auto;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+/* Las dos muescas del troquel, arriba y abajo de la línea punteada */
+.turno-destacado::before,
+.turno-destacado::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--ancho-talon) - 11px);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  z-index: 1;
+}
+
+.turno-destacado::before {
+  top: -12px;
+}
+.turno-destacado::after {
+  bottom: -12px;
+}
+
+.turno-fecha {
+  background: var(--azul);
+  color: #fff;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+}
+
+.turno-dia {
+  font-size: 3.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.turno-mes {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #d6e4f3;
+}
+
+.turno-info {
+  border-left: 2px dashed var(--borde-fuerte);
+  padding: 1.5rem 1.75rem;
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.turno-info h2 {
+  font-size: var(--titulo-3);
+  color: var(--texto-suave);
+}
+
+.turno-cuando {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* El día de la semana arranca con mayúscula ("Miércoles a las...") */
+.turno-cuando::first-letter {
+  text-transform: uppercase;
+}
+
+.turno-motivo {
+  color: var(--texto-suave);
+}
+
+.turno-ayuda {
+  margin-top: 0.4rem;
+  font-size: 0.9375rem;
+  color: var(--texto-suave);
+}
+
+.turno-acciones {
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* =========================================================
+   Pasos del turno: Pedido → Confirmado → Atendido
+   ========================================================= */
+.pasos {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: flex;
+  max-width: 28rem;
+}
+
+.paso {
+  flex: 1;
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 0.45rem;
+  padding-right: 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--texto-suave);
+}
+/* La línea que une un paso con el siguiente */
+.paso:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: calc(0.5rem - 1px);
+  left: 1rem;
+  right: 0;
+  height: 2px;
+  background: var(--borde);
+}
+
+.paso-punto {
+  position: relative;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid var(--borde-fuerte);
+  background: var(--superficie);
+}
+
+.paso.hecho .paso-punto {
+  background: var(--verde);
+  border-color: var(--verde);
+}
+
+.paso.hecho::before {
+  background: var(--verde);
+}
+
+.paso.actual {
+  color: var(--texto);
+  font-weight: 700;
+}
+
+.paso.actual .paso-punto {
+  background: var(--azul);
+  border-color: var(--azul);
+  box-shadow: 0 0 0 4px var(--azul-suave);
+}
+
+/* Si el turno está pendiente, el paso actual va en amarillo */
+.pasos[data-estado='pending'] .paso.actual .paso-punto {
+  background: var(--amarillo);
+  border-color: var(--amarillo);
+  box-shadow: 0 0 0 4px var(--amarillo-suave);
+}
+
+/* =========================================================
+   Botón de Ayuda del encabezado
+   ========================================================= */
+.boton-ayuda {
+  background: transparent;
+  color: var(--azul);
+  padding: 0.5rem 0.8rem;
+}
+
+.boton-ayuda:hover:not(:disabled) {
+  background: var(--azul-suave);
+}
+
+/* Enlaces con aspecto de botón (en la intro) */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--alto-toque);
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--radio-chico);
+  background: var(--azul);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.boton:hover {
+  background: var(--azul-hover);
+}
+
+.boton.secundario {
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1.5px solid var(--borde-fuerte);
+}
+
+.boton.secundario:hover {
+  background: var(--fondo);
+}
+
+/* =========================================================
+   Intro de AMBO
+   ========================================================= */
+.intro {
   min-height: 100vh;
   display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.intro-barra {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.intro-acciones {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.intro main {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 4rem;
+  display: grid;
+  gap: 4.5rem;
+}
+
+.intro-portada {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 3rem;
+  align-items: center;
+  padding-top: 2rem;
+}
+
+.intro-texto {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.intro-texto h1 {
+  font-size: 2.875rem;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  max-width: 15ch;
+}
+
+.intro-texto p {
+  font-size: 1.1875rem;
+  color: var(--texto-suave);
+  max-width: 46ch;
+}
+
+.intro-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.intro-botones .boton {
+  min-height: 3rem;
+  padding: 0.7rem 1.4rem;
+}
+
+/* El comprobante de ejemplo, apoyado sobre un fondo azul suave */
+.intro-muestra {
+  background: var(--azul-suave);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+}
+
+.intro-muestra .turno-destacado {
+  box-shadow: 0 12px 32px rgba(18, 60, 107, 0.16);
+}
+
+.intro-muestra .turno-destacado::before,
+.intro-muestra .turno-destacado::after {
+  background: var(--azul-suave);
+}
+
+.intro-seccion {
+  display: grid;
+  gap: 1.75rem;
+}
+
+/* Los tres pasos, unidos por una línea porque van en orden */
+.intro-recorrido {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.intro-recorrido li {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+.intro-recorrido li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 1.25rem;
+  left: 3.25rem;
+  right: -1.25rem;
+  height: 2px;
+  background: var(--borde-fuerte);
+}
+
+.intro-numero {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: grid;
   place-items: center;
-  padding: 1rem;
-  background:
-    radial-gradient(circle at 15% 20%, var(--azul-suave) 0, transparent 40%),
-    radial-gradient(circle at 85% 80%, var(--verde-suave) 0, transparent 40%),
-    var(--fondo);
+  font-weight: 700;
+  color: var(--azul-profundo);
 }
 
-.login {
-  width: min(400px, 100%);
-  grid-template-columns: 1fr;
-  padding: 2.25rem 2rem 2rem;
-  /* Franja de colores arriba de la tarjeta */
-  background:
-    var(--franja) top / 100% 6px no-repeat,
-    var(--superficie);
-  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.1);
+.intro-recorrido li:nth-child(1) .intro-numero {
+  background: var(--amarillo-suave);
+}
+.intro-recorrido li:nth-child(2) .intro-numero {
+  background: var(--azul-suave);
+}
+.intro-recorrido li:nth-child(3) .intro-numero {
+  background: var(--verde-suave);
 }
 
-.login h1 {
-  text-align: center;
-  margin-bottom: 0.25rem;
-}
-
-.login button[type='submit'] {
-  padding: 0.7rem 1rem;
-}
-
-.login-subtitulo {
-  text-align: center;
-  color: var(--texto-suave);
-  font-size: 0.9rem;
-  margin-top: -0.5rem;
-}
-
-.login-pie {
-  text-align: center;
-  font-size: 0.9rem;
+.intro-recorrido p,
+.intro-rol p {
   color: var(--texto-suave);
 }
 
-.login-pie a {
+/* Roles: columnas separadas por una línea, cada una con su color */
+.intro-roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--borde);
+}
+
+.intro-rol {
+  padding: 1.5rem 1.75rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+.intro-rol + .intro-rol {
+  padding-left: 1.75rem;
+  border-left: 1px solid var(--borde);
+}
+
+.intro-rol h3::before {
+  content: '';
+  display: block;
+  width: 2rem;
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 0.75rem;
+}
+
+.rol-paciente h3::before {
+  background: var(--amarillo);
+}
+.rol-enfermeria h3::before {
+  background: var(--verde);
+}
+.rol-administracion h3::before {
+  background: var(--azul);
+}
+
+.intro-pie {
+  border-top: 1px solid var(--borde);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  color: var(--texto-suave);
+  font-size: 0.9375rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+/* Botón con aspecto de enlace (por ejemplo, "Ver la guía" en el login) */
+.boton-enlace {
+  min-height: auto;
+  padding: 0.15rem 0.2rem;
+  background: transparent;
   color: var(--azul);
   font-weight: 600;
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.login-pie a:hover {
+.boton-enlace:hover:not(:disabled) {
+  background: transparent;
+  color: var(--azul-hover);
+}
+
+/* Botón con aspecto de enlace, para volver a ver la presentación */
+.intro-ver-presentacion {
+  min-height: auto;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  color: var(--azul);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.intro-ver-presentacion:hover:not(:disabled) {
+  background: transparent;
+  color: var(--azul-hover);
+}
+
+/* =========================================================
+   Guía paso a paso (tutorial)
+   ========================================================= */
+.tutorial {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+/* El recuadro resaltado: su sombra enorme oscurece todo lo demás */
+.tutorial-foco {
+  position: fixed;
+  border-radius: var(--radio);
+  box-shadow: 0 0 0 9999px rgba(15, 30, 50, 0.6);
+  outline: 3px solid var(--amarillo);
+  outline-offset: 2px;
+  transition:
+    top 0.2s,
+    left 0.2s,
+    width 0.2s,
+    height 0.2s;
+  pointer-events: none;
+}
+
+.tutorial-tarjeta {
+  position: fixed;
+  width: min(360px, calc(100vw - 32px));
+  background: var(--superficie);
+  border-radius: var(--radio);
+  box-shadow: 0 16px 40px rgba(15, 30, 50, 0.3);
+  padding: 1.25rem 1.25rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tutorial-tarjeta:focus {
+  outline: none;
+}
+
+.tutorial-tarjeta h2 {
+  font-size: var(--titulo-3);
+}
+
+.tutorial-progreso {
+  font-size: var(--texto-chico);
+  color: var(--texto-suave);
+}
+
+.tutorial-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tutorial-navegacion {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tutorial-saltar {
+  background: transparent;
+  color: var(--texto-suave);
+  padding: 0.5rem 0.4rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tutorial-saltar:hover:not(:disabled) {
+  background: transparent;
+  color: var(--texto);
   text-decoration: underline;
 }
 
 /* =========================================================
-   Celular
+   Login y registro: pantalla dividida
    ========================================================= */
+.auth {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+}
+
+.auth-lateral {
+  background: var(--azul-profundo);
+  color: #fff;
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2.5rem;
+}
+
+.auth-lateral .marca {
+  color: #fff;
+}
+
+.auth-lema {
+  font-size: 2.125rem;
+  line-height: 1.2;
+  font-weight: 700;
+  max-width: 16ch;
+}
+
+/* El recorrido de un turno, como pasos en orden */
+.auth-recorrido {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.1rem;
+  max-width: 34ch;
+}
+
+.auth-recorrido li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  color: #d6e4f3;
+}
+
+.auth-recorrido strong {
+  display: block;
+  color: #fff;
+}
+
+.auth-paso {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--azul-profundo);
+}
+
+.auth-recorrido li:nth-child(1) .auth-paso {
+  background: var(--amarillo);
+}
+.auth-recorrido li:nth-child(2) .auth-paso {
+  background: #9cc6ee;
+}
+.auth-recorrido li:nth-child(3) .auth-paso {
+  background: #8fd3ab;
+}
+
+.auth-principal {
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.auth-form {
+  width: min(440px, 100%);
+  grid-template-columns: 1fr;
+  gap: 1.1rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.auth-form h1 {
+  margin-bottom: -0.25rem;
+}
+
+.auth-ayuda {
+  color: var(--texto-suave);
+}
+
+.auth-form button[type='submit'] {
+  min-height: 3rem;
+  margin-top: 0.25rem;
+}
+
+.auth-pie {
+  color: var(--texto-suave);
+}
+
+/* Nombre y apellido lado a lado en el registro */
+.auth-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* =========================================================
+   Celular y tablet
+   ========================================================= */
+@media (max-width: 860px) {
+  .auth {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .auth-lateral {
+    padding: 1.25rem 1.5rem 1.5rem;
+    gap: 1rem;
+    justify-content: flex-start;
+  }
+
+  .auth-principal {
+    place-items: start center;
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-lema {
+    font-size: 1.5rem;
+    max-width: none;
+  }
+
+  /* En pantallas chicas el recorrido se oculta: primero el formulario */
+  .auth-recorrido {
+    display: none;
+  }
+
+  .intro-portada {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 0.5rem;
+  }
+
+  .intro-texto h1 {
+    font-size: 2.125rem;
+  }
+
+  .intro-recorrido,
+  .intro-roles {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-recorrido li:not(:last-child)::after {
+    display: none;
+  }
+
+  .intro-rol,
+  .intro-rol + .intro-rol {
+    padding: 1.25rem 0;
+    border-left: none;
+  }
+
+  .intro-rol + .intro-rol {
+    border-top: 1px solid var(--borde);
+  }
+}
+
 @media (max-width: 640px) {
   h1 {
-    font-size: 1.35rem;
+    font-size: 1.5rem;
   }
 
   .contenido {
-    padding: 1rem 0.75rem 2rem;
+    padding: 1.25rem 1rem 2.5rem;
   }
 
   form {
-    padding: 1rem;
+    padding: 1.1rem;
   }
 
-  .login {
-    padding: 2rem 1.25rem 1.5rem;
+  .encabezado-contenido {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding: 0.6rem 1rem;
   }
 
-  /* El nombre del usuario baja a una segunda línea */
-  .encabezado-contenido > button {
-    margin-left: auto;
-    order: 2;
+  /* En el encabezado del celular, el logo queda solo con las barras */
+  .encabezado .marca-texto {
+    display: none;
   }
-  .usuario {
+
+  .menu {
     order: 3;
     width: 100%;
-    margin-left: 0;
+  }
+
+  .sesion-datos {
+    display: none;
   }
 
   .pestanias {
@@ -565,5 +1332,73 @@ td button + button {
   }
   .pestanias button {
     flex: 1;
+  }
+  .auth-fila {
+    grid-template-columns: 1fr;
+  }
+
+  /* Comprobante en celular: talón más angosto y el botón abajo */
+  .turno-destacado {
+    --ancho-talon: 5.5rem;
+    grid-template-columns: var(--ancho-talon) 1fr;
+  }
+
+  .turno-dia {
+    font-size: 2.5rem;
+  }
+
+  .turno-info {
+    padding: 1.25rem;
+  }
+
+  .turno-cuando {
+    font-size: 1.25rem;
+  }
+
+  .turno-acciones {
+    grid-column: 1 / -1;
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--borde);
+  }
+
+  .turno-acciones button {
+    width: 100%;
+  }
+
+  /* Abajo está el botón: la muesca inferior no corresponde */
+  .turno-destacado::after {
+    display: none;
+  }
+
+  .paso {
+    font-size: 0.8125rem;
+  }
+
+  .intro main {
+    gap: 3rem;
+  }
+
+  .intro-muestra {
+    padding: 1.5rem 1rem;
+  }
+
+  .intro-acciones .boton.secundario {
+    display: none;
+  }
+
+  /* En el celular, la tarjeta de la guía siempre abajo, a lo ancho */
+  .tutorial-tarjeta {
+    top: auto !important;
+    bottom: 12px !important;
+    left: 12px !important;
+    right: 12px;
+    width: auto;
+  }
+}
+/* Respeta la opción "reducir movimiento" del sistema */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
   }
 }

@@ -1,0 +1,351 @@
+/* Presentación animada de AMBO.
+   Fondo claro, como el papel de una historia clínica, y las franjas de colores
+   de los ambos como protagonistas. Las clases llevan el prefijo amboi- para no
+   chocar con el resto de la app. */
+
+.amboi {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  background: var(--superficie);
+  color: var(--texto);
+  transition: opacity 0.6s ease;
+}
+
+.amboi.saliendo {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Cada escena ocupa toda la pantalla */
+.amboi > section {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+/* ---------- Colores de los ambos ---------- */
+.amboi-azul {
+  background: var(--azul);
+}
+.amboi-verde {
+  background: var(--verde);
+}
+.amboi-amarillo {
+  background: var(--amarillo);
+}
+.amboi-rosa {
+  background: var(--rosa);
+}
+.amboi-rojo {
+  background: var(--rojo);
+}
+
+/* ---------- Controles: sonido y saltar ---------- */
+.amboi-controles {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.amboi-control {
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1.5px solid var(--borde-fuerte);
+}
+
+.amboi-control:hover:not(:disabled) {
+  background: var(--fondo);
+}
+
+.amboi-control-icono {
+  width: var(--alto-toque);
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.amboi-control-icono svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* ---------- 1. Entrada ---------- */
+.amboi-entrada {
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: center;
+  animation: amboi-aparece 0.6s ease both;
+}
+
+.amboi-marca {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.amboi-logo {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 3.25rem;
+}
+
+.amboi-logo span {
+  width: 11px;
+  height: var(--alto);
+  border-radius: 6px;
+}
+
+.amboi-nombre {
+  font-size: clamp(2.5rem, 7vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  color: var(--azul-profundo);
+}
+
+.amboi-aviso {
+  color: var(--texto-suave);
+  font-size: 1.125rem;
+}
+
+.amboi-botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.amboi-botones button {
+  min-height: 3rem;
+  padding: 0.7rem 1.5rem;
+}
+
+/* ---------- 2. El llamador de la sala de espera ---------- */
+.amboi-llamado {
+  flex-direction: column;
+  gap: 2rem;
+  text-align: center;
+  background: var(--fondo);
+}
+
+.amboi-pantalla {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  padding: 1.5rem 3.25rem 1.75rem;
+  border-radius: 16px;
+  background: #0f2236;
+  box-shadow:
+    inset 0 0 0 6px #1b3550,
+    0 18px 40px rgba(15, 34, 54, 0.25);
+  overflow: hidden;
+  animation: amboi-aparece 0.5s ease both;
+}
+
+.amboi-pantalla-etiqueta {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #b9922a;
+}
+
+/* Números como los de un cartel luminoso */
+.amboi-pantalla-numero {
+  font-size: clamp(3.5rem, 11vw, 6rem);
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: #f4c84d;
+  text-shadow: 0 0 18px rgba(244, 200, 77, 0.45);
+  animation: amboi-cambia-numero 0.45s ease both;
+}
+
+.amboi-llamado-frase {
+  max-width: 24ch;
+  font-size: clamp(1.375rem, 3.4vw, 1.875rem);
+  font-weight: 700;
+  line-height: 1.25;
+  animation: amboi-aparece 0.6s ease both;
+}
+
+/* ---------- 3. Las franjas ---------- */
+.amboi-escena {
+  gap: clamp(2rem, 6vw, 5rem);
+}
+
+.amboi-franjas {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  width: min(40vw, 440px);
+  height: min(62vh, 500px);
+  transition:
+    width 1s cubic-bezier(0.6, 0, 0.2, 1),
+    height 1s cubic-bezier(0.6, 0, 0.2, 1),
+    gap 1s ease;
+}
+
+/* Suben desde abajo, como una tela que se despliega */
+.amboi-franja {
+  flex: 1;
+  height: 100%;
+  border-radius: 10px;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition:
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 1s cubic-bezier(0.6, 0, 0.2, 1),
+    border-radius 1s ease;
+}
+
+.amboi-franja.visible {
+  transform: scaleY(1);
+}
+
+.amboi-relato {
+  width: min(32rem, 44vw);
+}
+
+.amboi-pilar {
+  display: grid;
+  gap: 0.85rem;
+  animation: amboi-entra 0.55s ease both;
+}
+
+.amboi-pilar-color {
+  width: 3rem;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.amboi-pilar h2 {
+  font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+  color: var(--azul-profundo);
+  line-height: 1.15;
+}
+
+.amboi-pilar p {
+  font-size: 1.25rem;
+  color: var(--texto-suave);
+  max-width: 30ch;
+}
+
+/* ---------- 4. Final: las franjas se achican y forman el logo ---------- */
+.amboi-escena.final .amboi-franjas {
+  width: 6.5rem;
+  height: 7rem;
+  gap: 7px;
+}
+
+.amboi-escena.final .amboi-franja {
+  height: var(--alto);
+  border-radius: 8px;
+}
+
+.amboi-escena.final .amboi-relato {
+  width: auto;
+}
+
+.amboi-final {
+  display: grid;
+  justify-items: start;
+  gap: 0.6rem;
+  animation: amboi-entra 0.7s ease 0.5s both;
+}
+
+.amboi-final .amboi-nombre {
+  font-size: clamp(3rem, 9vw, 5rem);
+}
+
+.amboi-lema {
+  font-size: 1.25rem;
+  color: var(--texto-suave);
+  margin-bottom: 0.75rem;
+}
+
+.amboi-final button {
+  min-height: 3rem;
+  padding: 0.7rem 1.5rem;
+}
+
+/* ---------- Animaciones ---------- */
+@keyframes amboi-aparece {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes amboi-entra {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* El número nuevo baja como en los carteles de turnos */
+@keyframes amboi-cambia-numero {
+  from {
+    opacity: 0;
+    transform: translateY(-45%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 700px) {
+  .amboi-escena {
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .amboi-franjas {
+    width: min(78vw, 320px);
+    height: 34vh;
+  }
+
+  .amboi-relato {
+    width: 100%;
+    max-width: 26rem;
+  }
+
+  .amboi-pilar,
+  .amboi-final {
+    justify-items: center;
+  }
+
+  .amboi-pilar p {
+    margin: 0 auto;
+  }
+
+  .amboi-escena.final .amboi-franjas {
+    width: 5rem;
+    height: 5.5rem;
+  }
+
+  .amboi-pantalla {
+    padding: 1.25rem 2rem 1.5rem;
+  }
+}

@@ -10,6 +10,8 @@ async function bootstrap() {
   const port = configService.get<number>('PORT') || 3000;
   const usuariosServiceUrl =
     configService.get<string>('MS_USUARIOS_URL') || 'http://localhost:3001';
+  const turnosServiceUrl =
+    configService.get<string>('MS_TURNOS_URL') || 'http://localhost:3002';
 
   // Habilitar CORS
   app.enableCors({
@@ -34,8 +36,23 @@ async function bootstrap() {
     }),
   );
 
+  // Proxy inverso hacia ms-turnos: turnos y signos/síntomas
+  app.use(
+    createProxyMiddleware({
+      target: turnosServiceUrl,
+      changeOrigin: true,
+      pathFilter: (pathname: string) => {
+        return (
+          pathname.startsWith('/appointments') ||
+          pathname.startsWith('/signs-and-symptoms')
+        );
+      },
+    }),
+  );
+
   await app.listen(port);
   console.log(`🚀 API Gateway corriendo en http://localhost:${port}`);
   console.log(`🔗 Redirigiendo a ms-usuarios en ${usuariosServiceUrl}`);
+  console.log(`🔗 Redirigiendo a ms-turnos en ${turnosServiceUrl}`);
 }
 bootstrap();

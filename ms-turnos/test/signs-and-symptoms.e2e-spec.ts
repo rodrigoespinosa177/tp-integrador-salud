@@ -41,10 +41,18 @@ describe('SignsAndSymptoms (e2e)', () => {
       controllers: [SignsAndSymptomsController, AppointmentSignsController],
       providers: [
         SignsAndSymptomsService,
-        { provide: getModelToken(SignAndSymptom.name), useValue: new FakeSignModel() },
+        {
+          provide: getModelToken(SignAndSymptom.name),
+          useValue: new FakeSignModel(),
+        },
         {
           provide: AppointmentsService,
-          useValue: { findOne: () => Promise.resolve({ _id: TURNO_ID }) },
+          useValue: {
+            findOne: () =>
+              Promise.resolve({ _id: TURNO_ID, status: 'confirmed' }),
+            update: () =>
+              Promise.resolve({ _id: TURNO_ID, status: 'completed' }),
+          },
         },
       ],
     }).compile();

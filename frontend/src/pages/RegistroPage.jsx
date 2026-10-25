@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RUTA_POR_ROL } from '../routes/rutasPorRol';
+import AuthLayout from '../components/AuthLayout';
+import CampoPassword from '../components/CampoPassword';
 
 const VACIO = {
   first_name: '',
@@ -44,32 +46,36 @@ export default function RegistroPage() {
   if (user) return <Navigate to={RUTA_POR_ROL[user.rol]} replace />;
 
   return (
-    <div className="login-pagina">
-      <form className="login" onSubmit={handleSubmit}>
+    <AuthLayout>
+      <form className="auth-form" onSubmit={handleSubmit}>
         <h1>Crear cuenta</h1>
-        <p className="login-subtitulo">
-          Registrate como paciente para sacar turnos.
+        <p className="auth-ayuda">
+          Con tu cuenta de paciente podés pedir y seguir tus turnos.
         </p>
 
-        <label>
-          Nombre
-          <input
-            name="first_name"
-            value={datos.first_name}
-            onChange={handleChange}
-            required
-          />
-        </label>
+        <div className="auth-fila">
+          <label>
+            Nombre
+            <input
+              name="first_name"
+              autoComplete="given-name"
+              value={datos.first_name}
+              onChange={handleChange}
+              required
+            />
+          </label>
 
-        <label>
-          Apellido
-          <input
-            name="last_name"
-            value={datos.last_name}
-            onChange={handleChange}
-            required
-          />
-        </label>
+          <label>
+            Apellido
+            <input
+              name="last_name"
+              autoComplete="family-name"
+              value={datos.last_name}
+              onChange={handleChange}
+              required
+            />
+          </label>
+        </div>
 
         <label>
           DNI
@@ -89,29 +95,28 @@ export default function RegistroPage() {
           <input
             type="email"
             name="email"
+            autoComplete="email"
             value={datos.email}
             onChange={handleChange}
             required
           />
         </label>
 
-        <label>
-          Contraseña
-          <input
-            type="password"
-            name="password"
-            minLength={6}
-            value={datos.password}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
+        <CampoPassword
+          label="Contraseña"
+          name="password"
+          autoComplete="new-password"
+          minLength={6}
+          value={datos.password}
+          onChange={handleChange}
+          required
+        />
         <label>
           Teléfono (opcional)
           <input
             type="tel"
             name="phone"
+            autoComplete="tel"
             value={datos.phone}
             onChange={handleChange}
           />
@@ -123,10 +128,10 @@ export default function RegistroPage() {
           {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
         </button>
 
-        <p className="login-pie">
+        <p className="auth-pie">
           ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link>
         </p>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
