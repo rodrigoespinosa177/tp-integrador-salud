@@ -5,6 +5,26 @@ export const ETIQUETA_ESTADO = {
   completed: 'Atendido',
 };
 
+// Franjas de atención: de 08:00 a 17:00, cada 30 minutos
+export function generarHorarios(inicio = '08:00', fin = '17:00', paso = 30) {
+  const aMinutos = (h) => Number(h.slice(0, 2)) * 60 + Number(h.slice(3));
+  const horarios = [];
+  for (let m = aMinutos(inicio); m <= aMinutos(fin); m += paso) {
+    const hh = String(Math.floor(m / 60)).padStart(2, '0');
+    const mm = String(m % 60).padStart(2, '0');
+    horarios.push(`${hh}:${mm}`);
+  }
+  return horarios;
+}
+
+export const HORARIOS = generarHorarios();
+
+// Hora actual en formato "HH:mm" (hora local)
+export function horaActual() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
 // "2026-10-28" → "28/10/2026"
 export function formatearFecha(fecha) {
   const [anio, mes, dia] = fecha.split('-');

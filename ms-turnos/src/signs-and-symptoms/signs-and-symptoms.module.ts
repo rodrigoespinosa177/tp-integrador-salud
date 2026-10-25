@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppointmentsModule } from '../appointments/appointments.module';
+import { AuthModule } from '../auth/auth.module';
 import {
   SignAndSymptom,
   SignAndSymptomSchema,
@@ -18,6 +19,7 @@ import { SignsAndSymptomsService } from './signs-and-symptoms.service';
       { name: SignAndSymptom.name, schema: SignAndSymptomSchema },
     ]),
     AppointmentsModule,
+    AuthModule,
   ],
   controllers: [SignsAndSymptomsController, AppointmentSignsController],
   providers: [SignsAndSymptomsService, SignsAndSymptomsResolver],

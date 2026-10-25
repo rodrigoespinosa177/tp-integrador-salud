@@ -1,6 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsNotEmpty,
@@ -12,6 +13,7 @@ import { AppointmentStatus } from '../appointment-status.enum';
 
 // Se declaran los campos a mano (en vez de PartialType) porque el PartialType de
 // @nestjs/graphql no copia la metadata de Swagger y el body quedaría vacío en /api/docs.
+// assigned_by_id no se puede modificar.
 @InputType()
 export class UpdateAppointmentDto {
   @ApiPropertyOptional({ example: '665f1c2e8b3a4c0012a4d111' })
@@ -45,12 +47,15 @@ export class UpdateAppointmentDto {
   @IsNotEmpty()
   motive?: string;
 
-  @ApiPropertyOptional({ example: '665f1c2e8b3a4c0012a4d111' })
+  @ApiPropertyOptional({
+    example: true,
+    description:
+      'Marca o desmarca el turno como sobreturno. Solo el administrador',
+  })
   @Field({ nullable: true })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  assigned_by_id?: string;
+  @IsBoolean()
+  is_overbooking?: boolean;
 
   @ApiPropertyOptional({ enum: AppointmentStatus, example: 'cancelled' })
   @Field(() => AppointmentStatus, { nullable: true })

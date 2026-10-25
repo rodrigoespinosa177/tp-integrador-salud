@@ -4,6 +4,7 @@ import { ConflictException } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { Usuario } from './schemas/usuario.schema';
 import { Rol } from './enums/rol.enum';
+import { EstadoUsuarios } from './enums/estado-usuarios.enum';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 
 describe('UsuariosService', () => {
@@ -60,6 +61,26 @@ describe('UsuariosService', () => {
       expect(mockUsuarioModel.findOne).toHaveBeenCalledWith({
         email: dto.email,
       });
+    });
+  });
+
+  describe('findAll - filtro por estado', () => {
+    it.each([
+      [undefined, { is_active: true }],
+      [EstadoUsuarios.ACTIVE, { is_active: true }],
+      [EstadoUsuarios.INACTIVE, { is_active: false }],
+      [EstadoUsuarios.ALL, {}],
+    ])('estado %s consulta con el filtro %j', async (estado, filtro) => {
+      const usuarios = [{ _id: '1' }];
+      const exec = jest.fn().mockResolvedValue(usuarios);
+      const select = jest.fn().mockReturnValue({ exec });
+      mockUsuarioModel.find = jest.fn().mockReturnValue({ select });
+
+      const resultado = await service.findAll(estado);
+
+      expect(mockUsuarioModel.find).toHaveBeenCalledWith(filtro);
+      expect(select).toHaveBeenCalledWith('-password');
+      expect(resultado).toEqual(usuarios);
     });
   });
 

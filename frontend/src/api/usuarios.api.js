@@ -3,14 +3,23 @@ import { apiUsuarios } from './http';
 import { usuarios, esperar, nuevoId } from '../mocks/datos';
 import { normalizarUsuario } from '../utils/usuarios';
 
+function coincideEstado(u, estado) {
+  if (estado === 'all') return true;
+  return estado === 'inactive' ? u.is_active === false : u.is_active !== false;
+}
+
 function sinPassword({ password: _omitida, ...resto }) {
   return resto;
 }
 
-export async function obtenerUsuarios(rol) {
+// estado: 'active' (por defecto) | 'inactive' | 'all'
+export async function obtenerUsuarios(rol, estado = 'active') {
   if (USE_MOCKS_USUARIOS) {
     await esperar();
-    return usuarios.filter((u) => !rol || u.rol === rol).map(sinPassword);
+    return usuarios
+      .filter((u) => !rol || u.rol === rol)
+      .filter((u) => coincideEstado(u, estado))
+      .map(sinPassword);
   }
 
   // Los pacientes se piden a /usuarios/pacientes (lo pueden ver admin y enfermero)
@@ -20,7 +29,7 @@ export async function obtenerUsuarios(rol) {
   }
 
   // El listado completo es solo para el admin
-  const { data } = await apiUsuarios.get('/usuarios');
+  const { data } = await apiUsuarios.get('/usuarios', { params: { estado } });
   return data.filter((u) => !rol || u.rol === rol).map(normalizarUsuario);
 }
 
@@ -57,6 +66,11 @@ export async function actualizarUsuario(id, cambios) {
   }
   const { data } = await apiUsuarios.patch(`/usuarios/${id}`, cambios);
   return normalizarUsuario(data);
+}
+
+// Activa o desactiva (baja lógica reversible) a un usuario
+export function cambiarEstadoUsuario(id, is_active) {
+  return actualizarUsuario(id, { is_active });
 }
 
 // El propio usuario edita sus datos (no puede cambiar su rol)

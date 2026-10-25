@@ -2,8 +2,14 @@ import { useState } from 'react';
 
 const VACIO = { vital_signs: '', symptoms: '', observations: '' };
 
-export default function FormularioSignos({ onGuardar }) {
-  const [datos, setDatos] = useState(VACIO);
+// inicial (opcional): registro a editar
+export default function FormularioSignos({ inicial, onGuardar, onCancelar }) {
+  const esEdicion = Boolean(inicial);
+  const [datos, setDatos] = useState({
+    vital_signs: inicial?.vital_signs ?? '',
+    symptoms: inicial?.symptoms ?? '',
+    observations: inicial?.observations ?? '',
+  });
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
 
@@ -17,7 +23,7 @@ export default function FormularioSignos({ onGuardar }) {
     setGuardando(true);
     try {
       await onGuardar(datos);
-      setDatos(VACIO);
+      if (!esEdicion) setDatos(VACIO);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
@@ -27,7 +33,9 @@ export default function FormularioSignos({ onGuardar }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Registrar signos y síntomas</h3>
+      <h3>
+        {esEdicion ? 'Editar signos y síntomas' : 'Registrar signos y síntomas'}
+      </h3>
 
       <label>
         Signos vitales
@@ -64,8 +72,17 @@ export default function FormularioSignos({ onGuardar }) {
       {error && <p role="alert">{error}</p>}
 
       <button type="submit" disabled={guardando}>
-        {guardando ? 'Guardando...' : 'Guardar registro'}
+        {guardando
+          ? 'Guardando...'
+          : esEdicion
+            ? 'Guardar cambios'
+            : 'Guardar registro'}
       </button>
+      {onCancelar && (
+        <button type="button" className="secundario" onClick={onCancelar}>
+          Cancelar
+        </button>
+      )}
     </form>
   );
 }

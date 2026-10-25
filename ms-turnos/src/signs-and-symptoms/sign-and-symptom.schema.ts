@@ -5,6 +5,34 @@ import { HydratedDocument } from 'mongoose';
 
 export type SignAndSymptomDocument = HydratedDocument<SignAndSymptom>;
 
+// Nota de seguimiento que se suma al registro una vez pasada la ventana de edición.
+// Solo se agregan: no se editan ni se borran.
+@ObjectType()
+@Schema({ _id: false })
+export class AdditionalObservation {
+  @ApiProperty({ example: 'El paciente refiere mejoría' })
+  @Field()
+  @Prop({ required: true })
+  text: string;
+
+  @ApiProperty({
+    example: '665f1c2e8b3a4c0012a4d111',
+    description: 'Id del enfermero que escribió la nota',
+  })
+  @Field()
+  @Prop({ required: true })
+  nurse_id: string;
+
+  @ApiProperty({ example: '2026-10-28T11:20:00.000Z' })
+  @Field(() => Date)
+  @Prop({ type: Date, default: Date.now })
+  date: Date;
+}
+
+const AdditionalObservationSchema = SchemaFactory.createForClass(
+  AdditionalObservation,
+);
+
 @ObjectType()
 @Schema({ collection: 'signs_and_symptoms', timestamps: true })
 export class SignAndSymptom {
@@ -17,7 +45,7 @@ export class SignAndSymptom {
     description: 'Id del turno (MedicalAppointment) al que pertenece',
   })
   @Field()
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, unique: true })
   medical_appointment_id: string;
 
   @ApiProperty({
@@ -48,6 +76,14 @@ export class SignAndSymptom {
   @Prop({ required: true })
   observations: string;
 
+  @ApiProperty({
+    type: [AdditionalObservation],
+    description: 'Notas de seguimiento agregadas después del registro',
+  })
+  @Field(() => [AdditionalObservation])
+  @Prop({ type: [AdditionalObservationSchema], default: [] })
+  additional_observations: AdditionalObservation[];
+
   @ApiPropertyOptional({ example: '2026-10-23T22:05:46.429Z' })
   createdAt?: Date;
 
@@ -55,4 +91,5 @@ export class SignAndSymptom {
   updatedAt?: Date;
 }
 
-export const SignAndSymptomSchema = SchemaFactory.createForClass(SignAndSymptom);
+export const SignAndSymptomSchema =
+  SchemaFactory.createForClass(SignAndSymptom);

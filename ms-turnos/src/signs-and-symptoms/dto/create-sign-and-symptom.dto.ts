@@ -1,6 +1,11 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 @InputType()
 export class CreateSignAndSymptomDto {
@@ -10,11 +15,15 @@ export class CreateSignAndSymptomDto {
   @IsNotEmpty()
   medical_appointment_id: string;
 
-  @ApiProperty({ example: '665f1c2e8b3a4c0012a4d111' })
-  @Field()
+  @ApiPropertyOptional({
+    example: '665f1c2e8b3a4c0012a4d111',
+    description: 'Se ignora: siempre es el enfermero del token',
+  })
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  nurse_id: string;
+  nurse_id?: string;
 
   @ApiProperty({ example: 'PA 120/80 · T 36.5 °C · FC 72 · SpO2 98%' })
   @Field()

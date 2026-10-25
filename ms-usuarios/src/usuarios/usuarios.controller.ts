@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   ForbiddenException,
+  ParseEnumPipe,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
 import { UsuariosService } from './usuarios.service';
@@ -24,6 +27,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Rol } from './enums/rol.enum';
+import { EstadoUsuarios } from './enums/estado-usuarios.enum';
 import type { UsuarioDocument } from './schemas/usuario.schema';
 
 // Todos los endpoints requieren estar logueado. Los de /me los puede usar cualquier
@@ -121,16 +125,30 @@ export class UsuariosController {
   @Get()
   @Roles(Rol.ADMINISTRATOR)
   @ApiOperation({
-    summary: 'Listar los usuarios activos del sistema (solo Administrator)',
+    summary:
+      'Listar los usuarios del sistema, por defecto solo los activos (solo Administrator)',
   })
-  @ApiResponse({ status: 200, description: 'Lista de usuarios activos.' })
+  @ApiQuery({
+    name: 'estado',
+    enum: EstadoUsuarios,
+    required: false,
+    description: 'Filtra por estado. Si se omite, devuelve solo los activos.',
+  })
+  @ApiResponse({ status: 200, description: 'Lista de usuarios.' })
+  @ApiResponse({ status: 400, description: 'Valor de estado inválido.' })
   @ApiResponse({ status: 401, description: 'No autorizado.' })
   @ApiResponse({
     status: 403,
     description: 'Prohibido: se requiere rol Administrator.',
   })
-  findAll() {
-    return this.usuariosService.findAll();
+  findAll(
+    @Query(
+      'estado',
+      new ParseEnumPipe(EstadoUsuarios, { optional: true }),
+    )
+    estado?: EstadoUsuarios,
+  ) {
+    return this.usuariosService.findAll(estado);
   }
 
   @Get(':id')

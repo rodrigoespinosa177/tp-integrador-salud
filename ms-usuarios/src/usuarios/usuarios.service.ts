@@ -11,6 +11,7 @@ import { Usuario, UsuarioDocument } from './schemas/usuario.schema';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Rol } from './enums/rol.enum';
+import { EstadoUsuarios } from './enums/estado-usuarios.enum';
 
 @Injectable()
 export class UsuariosService {
@@ -49,11 +50,14 @@ export class UsuariosService {
     }
   }
 
-  async findAll(): Promise<UsuarioDocument[]> {
-    return this.usuarioModel
-      .find({ is_active: true })
-      .select('-password')
-      .exec();
+  async findAll(
+    estado: EstadoUsuarios = EstadoUsuarios.ACTIVE,
+  ): Promise<UsuarioDocument[]> {
+    const filtro =
+      estado === EstadoUsuarios.ALL
+        ? {}
+        : { is_active: estado === EstadoUsuarios.ACTIVE };
+    return this.usuarioModel.find(filtro).select('-password').exec();
   }
 
   async findPacientes(): Promise<UsuarioDocument[]> {
