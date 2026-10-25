@@ -506,6 +506,29 @@ td button + button {
   padding: 0.7rem 1rem;
 }
 
+.login-subtitulo {
+  text-align: center;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  margin-top: -0.5rem;
+}
+
+.login-pie {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.login-pie a {
+  color: var(--azul);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-pie a:hover {
+  text-decoration: underline;
+}
+
 /* =========================================================
    Celular
    ========================================================= */
