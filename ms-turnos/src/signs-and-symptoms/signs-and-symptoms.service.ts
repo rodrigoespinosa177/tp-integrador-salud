@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { AppointmentStatus } from '../appointments/appointment-status.enum';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { AppointmentsService } from '../appointments/appointments.service';
@@ -19,8 +24,30 @@ export class SignsAndSymptomsService {
 
   async create(dto: CreateSignAndSymptomDto): Promise<SignAndSymptomDocument> {
     // Lanza NotFoundException si el turno no existe
-    await this.appointmentsService.findOne(dto.medical_appointment_id);
-    return this.signModel.create(dto);
+    const turno = await this.appointmentsService.findOne(
+      dto.medical_appointment_id,
+    );
+
+    // Solo se atienden turnos confirmados (o ya atendidos, para sumar otro registro)
+    if (
+      turno.status !== AppointmentStatus.CONFIRMED &&
+      turno.status !== AppointmentStatus.COMPLETED
+    ) {
+      throw new BadRequestException(
+        'Solo se pueden registrar signos en turnos confirmados',
+      );
+    }
+
+    const registro = await this.signModel.create(dto);
+
+    // Registrar los signos es la atención: el turno pasa a "atendido"
+    if (turno.status !== AppointmentStatus.COMPLETED) {
+      await this.appointmentsService.update(dto.medical_appointment_id, {
+        status: AppointmentStatus.COMPLETED,
+      });
+    }
+
+    return registro;
   }
 
   findAll(appointmentId?: string): Promise<SignAndSymptomDocument[]> {
