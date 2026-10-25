@@ -6,7 +6,7 @@ export default function AuthLayout({ children }) {
   return (
     <div className="auth">
       <aside className="auth-lateral">
-        <Marca destino="/login" />
+        <Marca destino="/" />
 
         <p className="auth-lema">
           Tus turnos del centro de salud, en un solo lugar.

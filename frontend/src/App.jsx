@@ -7,10 +7,12 @@ import EnfermeroPage from './pages/EnfermeroPage';
 import AdminPage from './pages/AdminPage';
 import PerfilPage from './pages/PerfilPage';
 import RegistroPage from './pages/RegistroPage';
+import IntroPage from './pages/IntroPage';
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<IntroPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<RegistroPage />} />
       {/* Todo lo de acá adentro requiere estar logueado */}
@@ -31,8 +33,8 @@ export default function App() {
         </Route>
       </Route>
 
-      {/* Cualquier dirección que no exista, al login */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* Cualquier dirección que no exista, a la intro */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

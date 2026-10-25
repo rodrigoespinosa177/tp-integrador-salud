@@ -725,10 +725,10 @@ td button + button {
   display: grid;
   justify-items: start;
   gap: 0.45rem;
+  padding-right: 0.5rem;
   font-size: 0.9375rem;
   color: var(--texto-suave);
 }
-
 /* La línea que une un paso con el siguiente */
 .paso:not(:last-child)::before {
   content: '';
@@ -775,6 +775,316 @@ td button + button {
   background: var(--amarillo);
   border-color: var(--amarillo);
   box-shadow: 0 0 0 4px var(--amarillo-suave);
+}
+
+/* =========================================================
+   Botón de Ayuda del encabezado
+   ========================================================= */
+.boton-ayuda {
+  background: transparent;
+  color: var(--azul);
+  padding: 0.5rem 0.8rem;
+}
+
+.boton-ayuda:hover:not(:disabled) {
+  background: var(--azul-suave);
+}
+
+/* Enlaces con aspecto de botón (en la intro) */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--alto-toque);
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--radio-chico);
+  background: var(--azul);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.boton:hover {
+  background: var(--azul-hover);
+}
+
+.boton.secundario {
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1.5px solid var(--borde-fuerte);
+}
+
+.boton.secundario:hover {
+  background: var(--fondo);
+}
+
+/* =========================================================
+   Intro de AMBO
+   ========================================================= */
+.intro {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.intro-barra {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.intro-acciones {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.intro main {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 4rem;
+  display: grid;
+  gap: 4.5rem;
+}
+
+.intro-portada {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 3rem;
+  align-items: center;
+  padding-top: 2rem;
+}
+
+.intro-texto {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.intro-texto h1 {
+  font-size: 2.875rem;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  max-width: 15ch;
+}
+
+.intro-texto p {
+  font-size: 1.1875rem;
+  color: var(--texto-suave);
+  max-width: 46ch;
+}
+
+.intro-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.intro-botones .boton {
+  min-height: 3rem;
+  padding: 0.7rem 1.4rem;
+}
+
+/* El comprobante de ejemplo, apoyado sobre un fondo azul suave */
+.intro-muestra {
+  background: var(--azul-suave);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+}
+
+.intro-muestra .turno-destacado {
+  box-shadow: 0 12px 32px rgba(18, 60, 107, 0.16);
+}
+
+.intro-muestra .turno-destacado::before,
+.intro-muestra .turno-destacado::after {
+  background: var(--azul-suave);
+}
+
+.intro-seccion {
+  display: grid;
+  gap: 1.75rem;
+}
+
+/* Los tres pasos, unidos por una línea porque van en orden */
+.intro-recorrido {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.intro-recorrido li {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+.intro-recorrido li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 1.25rem;
+  left: 3.25rem;
+  right: -1.25rem;
+  height: 2px;
+  background: var(--borde-fuerte);
+}
+
+.intro-numero {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--azul-profundo);
+}
+
+.intro-recorrido li:nth-child(1) .intro-numero {
+  background: var(--amarillo-suave);
+}
+.intro-recorrido li:nth-child(2) .intro-numero {
+  background: var(--azul-suave);
+}
+.intro-recorrido li:nth-child(3) .intro-numero {
+  background: var(--verde-suave);
+}
+
+.intro-recorrido p,
+.intro-rol p {
+  color: var(--texto-suave);
+}
+
+/* Roles: columnas separadas por una línea, cada una con su color */
+.intro-roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--borde);
+}
+
+.intro-rol {
+  padding: 1.5rem 1.75rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+.intro-rol + .intro-rol {
+  padding-left: 1.75rem;
+  border-left: 1px solid var(--borde);
+}
+
+.intro-rol h3::before {
+  content: '';
+  display: block;
+  width: 2rem;
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 0.75rem;
+}
+
+.rol-paciente h3::before {
+  background: var(--amarillo);
+}
+.rol-enfermeria h3::before {
+  background: var(--verde);
+}
+.rol-administracion h3::before {
+  background: var(--azul);
+}
+
+.intro-pie {
+  border-top: 1px solid var(--borde);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  color: var(--texto-suave);
+  font-size: 0.9375rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+/* =========================================================
+   Guía paso a paso (tutorial)
+   ========================================================= */
+.tutorial {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+/* El recuadro resaltado: su sombra enorme oscurece todo lo demás */
+.tutorial-foco {
+  position: fixed;
+  border-radius: var(--radio);
+  box-shadow: 0 0 0 9999px rgba(15, 30, 50, 0.6);
+  outline: 3px solid var(--amarillo);
+  outline-offset: 2px;
+  transition:
+    top 0.2s,
+    left 0.2s,
+    width 0.2s,
+    height 0.2s;
+  pointer-events: none;
+}
+
+.tutorial-tarjeta {
+  position: fixed;
+  width: min(360px, calc(100vw - 32px));
+  background: var(--superficie);
+  border-radius: var(--radio);
+  box-shadow: 0 16px 40px rgba(15, 30, 50, 0.3);
+  padding: 1.25rem 1.25rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tutorial-tarjeta:focus {
+  outline: none;
+}
+
+.tutorial-tarjeta h2 {
+  font-size: var(--titulo-3);
+}
+
+.tutorial-progreso {
+  font-size: var(--texto-chico);
+  color: var(--texto-suave);
+}
+
+.tutorial-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tutorial-navegacion {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tutorial-saltar {
+  background: transparent;
+  color: var(--texto-suave);
+  padding: 0.5rem 0.4rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tutorial-saltar:hover:not(:disabled) {
+  background: transparent;
+  color: var(--texto);
+  text-decoration: underline;
 }
 
 /* =========================================================
@@ -920,6 +1230,35 @@ td button + button {
   .auth-recorrido {
     display: none;
   }
+
+  .intro-portada {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 0.5rem;
+  }
+
+  .intro-texto h1 {
+    font-size: 2.125rem;
+  }
+
+  .intro-recorrido,
+  .intro-roles {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-recorrido li:not(:last-child)::after {
+    display: none;
+  }
+
+  .intro-rol,
+  .intro-rol + .intro-rol {
+    padding: 1.25rem 0;
+    border-left: none;
+  }
+
+  .intro-rol + .intro-rol {
+    border-top: 1px solid var(--borde);
+  }
 }
 
 @media (max-width: 640px) {
@@ -1000,10 +1339,29 @@ td button + button {
 
   .paso {
     font-size: 0.8125rem;
-    padding-right: 0.5rem;
+  }
+
+  .intro main {
+    gap: 3rem;
+  }
+
+  .intro-muestra {
+    padding: 1.5rem 1rem;
+  }
+
+  .intro-acciones .boton.secundario {
+    display: none;
+  }
+
+  /* En el celular, la tarjeta de la guía siempre abajo, a lo ancho */
+  .tutorial-tarjeta {
+    top: auto !important;
+    bottom: 12px !important;
+    left: 12px !important;
+    right: 12px;
+    width: auto;
   }
 }
-
 /* Respeta la opción "reducir movimiento" del sistema */
 @media (prefers-reduced-motion: reduce) {
   * {

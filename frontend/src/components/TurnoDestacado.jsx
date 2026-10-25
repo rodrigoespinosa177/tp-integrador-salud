@@ -7,7 +7,8 @@ const AYUDA = {
   confirmed: 'Te recomendamos llegar 10 minutos antes.',
 };
 
-// El próximo turno del paciente, con forma de comprobante de turno
+// El próximo turno del paciente, con forma de comprobante de turno.
+// Sin onCancelar no muestra el botón (así se usa de ejemplo en la intro)
 export default function TurnoDestacado({ turno, onCancelar }) {
   const { dia, mes, diaSemana } = partesFecha(turno.date);
 
@@ -30,11 +31,13 @@ export default function TurnoDestacado({ turno, onCancelar }) {
         )}
       </div>
 
-      <div className="turno-acciones">
-        <button className="peligro" onClick={() => onCancelar(turno._id)}>
-          Cancelar turno
-        </button>
-      </div>
+      {onCancelar && (
+        <div className="turno-acciones">
+          <button className="peligro" onClick={() => onCancelar(turno._id)}>
+            Cancelar turno
+          </button>
+        </div>
+      )}
     </article>
   );
 }
