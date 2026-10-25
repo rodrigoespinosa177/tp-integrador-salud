@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { Rol } from '../auth/rol.enum';
 import { UsuariosClient } from '../auth/usuarios-client.service';
 import { AppointmentStatus } from './appointment-status.enum';
 import { Appointment } from './appointment.schema';
+import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { AppointmentsService } from './appointments.service';
 
 const paciente: AuthUser = {
@@ -30,6 +32,8 @@ describe('AppointmentsService', () => {
   const exec = jest.fn();
   const model = {
     create: jest.fn(),
+    distinct: jest.fn(),
+    exists: jest.fn(),
     find: jest.fn(),
     findById: jest.fn(),
     findByIdAndUpdate: jest.fn(),
@@ -95,9 +99,57 @@ describe('AppointmentsService', () => {
       expect(model.create).toHaveBeenCalledWith({
         ...datos,
         status: undefined,
+        is_overbooking: false,
         patient_id: 'u3',
         assigned_by_id: 'u1',
       });
+    });
+
+    it('rechaza el turno si el horario ya está ocupado, sea cual sea el paciente', async () => {
+      model.exists.mockResolvedValue({ _id: 'otro' });
+
+      await expect(
+        service.create({ ...datos, patient_id: 'u3' }, paciente),
+      ).rejects.toThrow(ConflictException);
+      await expect(
+        service.create({ ...datos, patient_id: 'u3' }, admin),
+      ).rejects.toThrow(ConflictException);
+      expect(model.exists).toHaveBeenCalledWith({
+        date: datos.date,
+        hour: datos.hour,
+        status: { $ne: AppointmentStatus.CANCELLED },
+      });
+      expect(model.create).not.toHaveBeenCalled();
+    });
+
+    it('el administrador puede dar un sobreturno en un horario ocupado', async () => {
+      model.exists.mockResolvedValue({ _id: 'otro' });
+      model.create.mockResolvedValue({});
+
+      await service.create(
+        { ...datos, patient_id: 'u3', is_overbooking: true },
+        admin,
+      );
+
+      expect(model.exists).not.toHaveBeenCalled();
+      expect(model.create).toHaveBeenCalledWith(
+        expect.objectContaining({ patient_id: 'u3', is_overbooking: true }),
+      );
+    });
+
+    it('un paciente no puede pedir un sobreturno', async () => {
+      await expect(
+        service.create({ ...datos, is_overbooking: true }, paciente),
+      ).rejects.toThrow(ForbiddenException);
+      expect(model.create).not.toHaveBeenCalled();
+    });
+
+    it('convierte el error de índice duplicado en ConflictException', async () => {
+      model.create.mockRejectedValue({ code: 11000 });
+
+      await expect(service.create(datos, paciente)).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('el administrador debe indicar el paciente', async () => {
@@ -115,6 +167,22 @@ describe('AppointmentsService', () => {
         service.create({ ...datos, patient_id: 'u9' }, admin),
       ).rejects.toThrow(BadRequestException);
       expect(model.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('occupiedHours', () => {
+    it('devuelve ordenadas las horas de los turnos no cancelados de la fecha', async () => {
+      model.distinct.mockReturnValue({
+        exec: () => Promise.resolve(['11:00', '09:30']),
+      });
+
+      const horas = await service.occupiedHours('2026-10-28');
+
+      expect(model.distinct).toHaveBeenCalledWith('hour', {
+        date: '2026-10-28',
+        status: { $ne: AppointmentStatus.CANCELLED },
+      });
+      expect(horas).toEqual(['09:30', '11:00']);
     });
   });
 
@@ -179,13 +247,18 @@ describe('AppointmentsService', () => {
         exec: () => Promise.resolve({}),
       });
 
-      await service.update(
+      // Como llega en producción: instancia del DTO (claves no enviadas = undefined)
+      const dto = Object.assign(new UpdateAppointmentDto(), {
+        status: AppointmentStatus.CANCELLED,
+      });
+
+      await service.update(id, dto, paciente);
+
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         id,
         { status: AppointmentStatus.CANCELLED },
-        paciente,
+        expect.anything(),
       );
-
-      expect(model.findByIdAndUpdate).toHaveBeenCalled();
     });
 
     it.each([
@@ -211,6 +284,88 @@ describe('AppointmentsService', () => {
       await expect(
         service.update(id, { status: AppointmentStatus.CANCELLED }, paciente),
       ).rejects.toThrow(BadRequestException);
+    });
+
+    it('no deja mover el turno a un horario ocupado y excluye al propio turno del chequeo', async () => {
+      model.findById.mockReturnValue({
+        exec: () =>
+          Promise.resolve({
+            ...propio(AppointmentStatus.PENDING),
+            date: '2026-10-28',
+            hour: '09:30',
+          }),
+      });
+      model.exists.mockResolvedValue({ _id: 'otro' });
+
+      await expect(
+        service.update(id, { hour: '10:00' }, admin),
+      ).rejects.toThrow(ConflictException);
+      expect(model.exists).toHaveBeenCalledWith({
+        date: '2026-10-28',
+        hour: '10:00',
+        status: { $ne: AppointmentStatus.CANCELLED },
+        _id: { $ne: id },
+      });
+      expect(model.findByIdAndUpdate).not.toHaveBeenCalled();
+    });
+
+    it('el administrador puede mover un turno a un horario ocupado si es sobreturno', async () => {
+      model.findById.mockReturnValue({
+        exec: () =>
+          Promise.resolve({
+            ...propio(AppointmentStatus.PENDING),
+            date: '2026-10-28',
+            hour: '09:30',
+          }),
+      });
+      model.findByIdAndUpdate.mockReturnValue({
+        exec: () => Promise.resolve({}),
+      });
+      model.exists.mockResolvedValue({ _id: 'otro' });
+
+      await service.update(id, { hour: '10:00', is_overbooking: true }, admin);
+
+      expect(model.exists).not.toHaveBeenCalled();
+      expect(model.findByIdAndUpdate).toHaveBeenCalled();
+    });
+
+    it('un paciente no puede marcar su turno como sobreturno', async () => {
+      model.findById.mockReturnValue({
+        exec: () => Promise.resolve(propio(AppointmentStatus.PENDING)),
+      });
+
+      await expect(
+        service.update(id, { is_overbooking: true }, paciente),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('reactivar un turno cancelado también exige horario libre', async () => {
+      model.findById.mockReturnValue({
+        exec: () =>
+          Promise.resolve({
+            ...propio(AppointmentStatus.CANCELLED),
+            date: '2026-10-28',
+            hour: '09:30',
+          }),
+      });
+      model.exists.mockResolvedValue({ _id: 'otro' });
+
+      await expect(
+        service.update(id, { status: AppointmentStatus.CONFIRMED }, admin),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('cancelar nunca consulta el horario', async () => {
+      model.findById.mockReturnValue({
+        exec: () => Promise.resolve(propio(AppointmentStatus.PENDING)),
+      });
+      model.findByIdAndUpdate.mockReturnValue({
+        exec: () => Promise.resolve({}),
+      });
+
+      await service.update(id, { status: AppointmentStatus.CANCELLED }, admin);
+
+      expect(model.exists).not.toHaveBeenCalled();
     });
 
     it('al reasignar el turno, el administrador valida al nuevo paciente', async () => {

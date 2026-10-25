@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,7 +11,10 @@ import { AppointmentStatus } from '../appointments/appointment-status.enum';
 import type { AuthUser } from '../auth/auth-user';
 import { Rol } from '../auth/rol.enum';
 import { SignAndSymptom } from './sign-and-symptom.schema';
-import { SignsAndSymptomsService } from './signs-and-symptoms.service';
+import {
+  SignsAndSymptomsService,
+  VENTANA_EDICION_MS,
+} from './signs-and-symptoms.service';
 
 const enfermero: AuthUser = {
   id: 'u2',
@@ -36,6 +40,7 @@ describe('SignsAndSymptomsService', () => {
   const exec = jest.fn();
   const model = {
     create: jest.fn(),
+    exists: jest.fn(),
     find: jest.fn(),
     findById: jest.fn(),
     findByIdAndUpdate: jest.fn(),
@@ -55,9 +60,10 @@ describe('SignsAndSymptomsService', () => {
     observations: 'Hidratación',
   };
   const idRegistro = '665f1c2e8b3a4c0012a4d333';
-  const registroDe = (nurse_id: string) => ({
+  const registroDe = (nurse_id: string, creadoHaceMs = 0) => ({
     nurse_id,
     medical_appointment_id: dto.medical_appointment_id,
+    createdAt: new Date(Date.now() - creadoHaceMs),
   });
 
   beforeEach(async () => {
@@ -115,6 +121,33 @@ describe('SignsAndSymptomsService', () => {
         expect(model.create).not.toHaveBeenCalled();
       },
     );
+
+    it('un turno se registra una sola vez', async () => {
+      appointmentsService.findOne.mockResolvedValue({
+        status: AppointmentStatus.COMPLETED,
+      });
+      model.exists.mockResolvedValue({ _id: 'ya-existe' });
+
+      await expect(service.create(dto, enfermero)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(model.exists).toHaveBeenCalledWith({
+        medical_appointment_id: dto.medical_appointment_id,
+      });
+      expect(model.create).not.toHaveBeenCalled();
+    });
+
+    it('convierte el error de índice duplicado en ConflictException', async () => {
+      appointmentsService.findOne.mockResolvedValue({
+        status: AppointmentStatus.CONFIRMED,
+      });
+      model.create.mockRejectedValue({ code: 11000 });
+
+      await expect(service.create(dto, enfermero)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(appointmentsService.applyUpdate).not.toHaveBeenCalled();
+    });
 
     it('no crea el registro si el turno no existe', async () => {
       appointmentsService.findOne.mockRejectedValue(new NotFoundException());
@@ -189,6 +222,52 @@ describe('SignsAndSymptomsService', () => {
     });
   });
 
+  describe('addObservation', () => {
+    it.each([
+      ['dentro de la ventana de edición', 0],
+      ['pasados los 5 minutos', VENTANA_EDICION_MS + 60_000],
+    ])(
+      'agrega la nota a nombre del enfermero del token %s',
+      async (_c, hace) => {
+        model.findById.mockReturnValue({
+          exec: () => Promise.resolve(registroDe('u8', hace)),
+        });
+        model.findByIdAndUpdate.mockReturnValue({
+          exec: () => Promise.resolve({}),
+        });
+
+        await service.addObservation(
+          idRegistro,
+          { text: 'Mejoría' },
+          enfermero,
+        );
+
+        expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
+          idRegistro,
+          {
+            $push: {
+              additional_observations: {
+                text: 'Mejoría',
+                nurse_id: 'u2',
+                date: expect.any(Date),
+              },
+            },
+          },
+          expect.anything(),
+        );
+      },
+    );
+
+    it('lanza NotFoundException si el registro no existe', async () => {
+      model.findById.mockReturnValue({ exec: () => Promise.resolve(null) });
+
+      await expect(
+        service.addObservation(idRegistro, { text: 'Nota' }, enfermero),
+      ).rejects.toThrow(NotFoundException);
+      expect(model.findByIdAndUpdate).not.toHaveBeenCalled();
+    });
+  });
+
   describe('update / remove', () => {
     beforeEach(() => {
       model.findByIdAndUpdate.mockReturnValue({
@@ -224,6 +303,41 @@ describe('SignsAndSymptomsService', () => {
       );
       expect(model.findByIdAndDelete).not.toHaveBeenCalled();
     });
+
+    it('dentro de los 5 minutos todavía se puede modificar y borrar', async () => {
+      model.findById.mockReturnValue({
+        exec: () =>
+          Promise.resolve(registroDe('u2', VENTANA_EDICION_MS - 1000)),
+      });
+
+      await service.update(idRegistro, { symptoms: 'Fiebre' }, enfermero);
+      await service.remove(idRegistro, enfermero);
+
+      expect(model.findByIdAndUpdate).toHaveBeenCalled();
+      expect(model.findByIdAndDelete).toHaveBeenCalled();
+    });
+
+    it.each([
+      ['enfermero', enfermero],
+      ['administrador', admin],
+    ])(
+      'pasados los 5 minutos ni el %s puede modificar ni borrar',
+      async (_rol, usuario) => {
+        model.findById.mockReturnValue({
+          exec: () =>
+            Promise.resolve(registroDe('u2', VENTANA_EDICION_MS + 1000)),
+        });
+
+        await expect(
+          service.update(idRegistro, { symptoms: 'Fiebre' }, usuario),
+        ).rejects.toThrow(ForbiddenException);
+        await expect(service.remove(idRegistro, usuario)).rejects.toThrow(
+          ForbiddenException,
+        );
+        expect(model.findByIdAndUpdate).not.toHaveBeenCalled();
+        expect(model.findByIdAndDelete).not.toHaveBeenCalled();
+      },
+    );
 
     it('el administrador puede modificar cualquier registro', async () => {
       model.findById.mockReturnValue({

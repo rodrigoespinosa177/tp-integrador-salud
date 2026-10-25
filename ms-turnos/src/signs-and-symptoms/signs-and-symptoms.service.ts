@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -10,12 +11,19 @@ import { AppointmentStatus } from '../appointments/appointment-status.enum';
 import { AppointmentsService } from '../appointments/appointments.service';
 import type { AuthUser } from '../auth/auth-user';
 import { Rol } from '../auth/rol.enum';
+import { AddObservationDto } from './dto/add-observation.dto';
 import { CreateSignAndSymptomDto } from './dto/create-sign-and-symptom.dto';
 import { UpdateSignAndSymptomDto } from './dto/update-sign-and-symptom.dto';
 import {
   SignAndSymptom,
   SignAndSymptomDocument,
 } from './sign-and-symptom.schema';
+
+// Pasado este tiempo desde que se creó, un registro ya no se puede modificar ni borrar
+export const VENTANA_EDICION_MS = 5 * 60 * 1000;
+
+const MENSAJE_YA_REGISTRADO =
+  'Este turno ya tiene signos y síntomas registrados';
 
 @Injectable()
 export class SignsAndSymptomsService {
@@ -45,11 +53,29 @@ export class SignsAndSymptomsService {
       );
     }
 
+    // Un turno se registra una sola vez
+    if (
+      await this.signModel.exists({
+        medical_appointment_id: dto.medical_appointment_id,
+      })
+    ) {
+      throw new ConflictException(MENSAJE_YA_REGISTRADO);
+    }
+
     const { nurse_id: _ignorado, ...datos } = dto;
-    const registro = await this.signModel.create({
-      ...datos,
-      nurse_id: user.id,
-    });
+    let registro: SignAndSymptomDocument;
+    try {
+      registro = await this.signModel.create({
+        ...datos,
+        nurse_id: user.id,
+      });
+    } catch (error) {
+      // Si dos pedidos pasan el chequeo a la vez, el índice único corta al segundo
+      if ((error as { code?: number })?.code === 11000) {
+        throw new ConflictException(MENSAJE_YA_REGISTRADO);
+      }
+      throw error;
+    }
 
     // Registrar los signos es la atención: el turno pasa a "atendido"
     if (turno.status !== AppointmentStatus.COMPLETED) {
@@ -114,8 +140,41 @@ export class SignsAndSymptomsService {
     user: AuthUser,
   ): Promise<SignAndSymptomDocument> {
     await this.findEditable(id, user);
+    // El DTO transformado trae todas las claves; las no enviadas valen undefined
+    const cambios = Object.fromEntries(
+      Object.entries(dto).filter(([, valor]) => valor !== undefined),
+    );
     const sign = await this.signModel
-      .findByIdAndUpdate(id, dto, { new: true, runValidators: true })
+      .findByIdAndUpdate(id, cambios, { new: true, runValidators: true })
+      .exec();
+    if (!sign) {
+      throw new NotFoundException(`Registro ${id} no encontrado`);
+    }
+    return sign;
+  }
+
+  // Pasada la ventana de edición el registro queda cerrado, pero cualquier enfermero
+  // puede sumarle notas de seguimiento. Solo se agregan: no se editan ni se borran.
+  async addObservation(
+    id: string,
+    dto: AddObservationDto,
+    user: AuthUser,
+  ): Promise<SignAndSymptomDocument> {
+    await this.findById(id);
+    const sign = await this.signModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $push: {
+            additional_observations: {
+              text: dto.text,
+              nurse_id: user.id,
+              date: new Date(),
+            },
+          },
+        },
+        { new: true, runValidators: true },
+      )
       .exec();
     if (!sign) {
       throw new NotFoundException(`Registro ${id} no encontrado`);
@@ -138,12 +197,19 @@ export class SignsAndSymptomsService {
     return sign;
   }
 
-  // Un enfermero solo modifica sus propios registros; el administrador cualquiera
+  // Solo dentro de los primeros 5 minutos (para todos los roles). Un enfermero
+  // modifica únicamente sus propios registros; el administrador cualquiera.
   private async findEditable(
     id: string,
     user: AuthUser,
   ): Promise<SignAndSymptomDocument> {
     const sign = await this.findById(id);
+    const creado = sign.createdAt?.getTime() ?? 0;
+    if (Date.now() - creado > VENTANA_EDICION_MS) {
+      throw new ForbiddenException(
+        'Solo se puede modificar un registro dentro de los 5 minutos de su creación',
+      );
+    }
     if (user.rol === Rol.NURSE && sign.nurse_id !== user.id) {
       throw new ForbiddenException('Este registro lo cargó otro enfermero');
     }

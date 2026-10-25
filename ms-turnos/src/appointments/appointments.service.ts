@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -14,6 +15,15 @@ import { Appointment, AppointmentDocument } from './appointment.schema';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
+// Quita las propiedades sin valor: el DTO transformado las trae todas como undefined
+function soloDefinidos(dto: UpdateAppointmentDto): UpdateAppointmentDto {
+  return Object.fromEntries(
+    Object.entries(dto).filter(([, valor]) => valor !== undefined),
+  );
+}
+
+const MENSAJE_HORARIO_OCUPADO = 'Ya hay un turno reservado en esa fecha y hora';
+
 @Injectable()
 export class AppointmentsService {
   constructor(
@@ -26,14 +36,26 @@ export class AppointmentsService {
     dto: CreateAppointmentDto,
     user: AuthUser,
   ): Promise<AppointmentDocument> {
-    const { patient_id: _p, assigned_by_id: _a, status, ...datos } = dto;
+    const {
+      patient_id: _p,
+      assigned_by_id: _a,
+      status,
+      is_overbooking: sobreturno,
+      ...datos
+    } = dto;
 
     if (user.rol === Rol.PATIENT) {
       // Un paciente solo se saca turnos a sí mismo y siempre quedan pendientes
       if (dto.patient_id && dto.patient_id !== user.id) {
         throw new ForbiddenException('Solo podés sacar turnos para vos');
       }
-      return this.appointmentModel.create({
+      if (sobreturno) {
+        throw new ForbiddenException(
+          'Solo el administrador puede dar sobreturnos',
+        );
+      }
+      await this.assertHorarioLibre(dto.date, dto.hour);
+      return this.crear({
         ...datos,
         patient_id: user.id,
         assigned_by_id: user.id,
@@ -44,9 +66,14 @@ export class AppointmentsService {
       throw new BadRequestException('patient_id es obligatorio');
     }
     await this.usuariosClient.assertPacienteActivo(dto.patient_id, user.token);
-    return this.appointmentModel.create({
+    // Un sobreturno se salta la regla de horario único
+    if (status !== AppointmentStatus.CANCELLED && !sobreturno) {
+      await this.assertHorarioLibre(dto.date, dto.hour);
+    }
+    return this.crear({
       ...datos,
       status,
+      is_overbooking: Boolean(sobreturno),
       patient_id: dto.patient_id,
       assigned_by_id: user.id,
     });
@@ -64,6 +91,18 @@ export class AppointmentsService {
     }
     const filter = patientId ? { patient_id: patientId } : {};
     return this.appointmentModel.find(filter).sort({ date: 1, hour: 1 }).exec();
+  }
+
+  // Horas ya reservadas (turnos no cancelados) de una fecha. No expone datos de
+  // pacientes, por eso la puede consultar cualquier usuario logueado.
+  occupiedHours(date: string): Promise<string[]> {
+    return this.appointmentModel
+      .distinct('hour', {
+        date,
+        status: { $ne: AppointmentStatus.CANCELLED },
+      })
+      .exec()
+      .then((horas) => [...horas].sort());
   }
 
   // Sin chequeo de permisos: para uso interno de otros servicios
@@ -95,8 +134,9 @@ export class AppointmentsService {
 
     if (user.rol === Rol.PATIENT) {
       // Lo único que puede hacer un paciente es cancelar su turno
+      // (con transform, el DTO trae todas las claves; las no enviadas valen undefined)
       const soloCancela =
-        Object.keys(dto).length === 1 &&
+        Object.keys(soloDefinidos(dto)).length === 1 &&
         dto.status === AppointmentStatus.CANCELLED;
       if (!soloCancela) {
         throw new ForbiddenException(
@@ -113,23 +153,49 @@ export class AppointmentsService {
       );
     }
 
+    // Reservar, mover o reactivar un turno exige que el horario esté libre
+    const estadoFinal = dto.status ?? actual.status;
+    const cambiaHorario =
+      (dto.date !== undefined && dto.date !== actual.date) ||
+      (dto.hour !== undefined && dto.hour !== actual.hour) ||
+      (actual.status === AppointmentStatus.CANCELLED &&
+        estadoFinal !== AppointmentStatus.CANCELLED);
+    const esSobreturno = dto.is_overbooking ?? actual.is_overbooking ?? false;
+    if (
+      estadoFinal !== AppointmentStatus.CANCELLED &&
+      cambiaHorario &&
+      !esSobreturno
+    ) {
+      await this.assertHorarioLibre(
+        dto.date ?? actual.date,
+        dto.hour ?? actual.hour,
+        id,
+      );
+    }
+
     return this.applyUpdate(id, dto);
   }
 
   // Cambio de estado hecho por el sistema (ej. al registrar signos); no depende de un usuario
-  applyUpdate(
+  async applyUpdate(
     id: string,
     dto: UpdateAppointmentDto,
   ): Promise<AppointmentDocument> {
-    return this.appointmentModel
-      .findByIdAndUpdate(id, dto, { new: true, runValidators: true })
-      .exec()
-      .then((appointment) => {
-        if (!appointment) {
-          throw new NotFoundException(`Turno ${id} no encontrado`);
-        }
-        return appointment;
-      });
+    let appointment: AppointmentDocument | null;
+    try {
+      appointment = await this.appointmentModel
+        .findByIdAndUpdate(id, soloDefinidos(dto), {
+          new: true,
+          runValidators: true,
+        })
+        .exec();
+    } catch (error) {
+      throw this.aConflicto(error);
+    }
+    if (!appointment) {
+      throw new NotFoundException(`Turno ${id} no encontrado`);
+    }
+    return appointment;
   }
 
   async remove(id: string): Promise<void> {
@@ -139,5 +205,39 @@ export class AppointmentsService {
     if (!deleted) {
       throw new NotFoundException(`Turno ${id} no encontrado`);
     }
+  }
+
+  // Un horario (fecha + hora) admite un solo turno no cancelado, sea cual sea el paciente
+  private async assertHorarioLibre(
+    date: string,
+    hour: string,
+    excluirId?: string,
+  ): Promise<void> {
+    const ocupado = await this.appointmentModel.exists({
+      date,
+      hour,
+      status: { $ne: AppointmentStatus.CANCELLED },
+      ...(excluirId && { _id: { $ne: excluirId } }),
+    });
+    if (ocupado) {
+      throw new ConflictException(MENSAJE_HORARIO_OCUPADO);
+    }
+  }
+
+  private async crear(
+    datos: Partial<Appointment>,
+  ): Promise<AppointmentDocument> {
+    try {
+      return await this.appointmentModel.create(datos);
+    } catch (error) {
+      throw this.aConflicto(error);
+    }
+  }
+
+  // Si dos pedidos pasan el chequeo a la vez, el índice único corta al segundo
+  private aConflicto(error: unknown): unknown {
+    return (error as { code?: number })?.code === 11000
+      ? new ConflictException(MENSAJE_HORARIO_OCUPADO)
+      : error;
   }
 }

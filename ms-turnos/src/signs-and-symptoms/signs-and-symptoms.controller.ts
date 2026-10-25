@@ -30,6 +30,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Rol } from '../auth/rol.enum';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
+import { AddObservationDto } from './dto/add-observation.dto';
 import { CreateSignAndSymptomDto } from './dto/create-sign-and-symptom.dto';
 import { UpdateSignAndSymptomDto } from './dto/update-sign-and-symptom.dto';
 import { SignAndSymptom } from './sign-and-symptom.schema';
@@ -101,6 +102,27 @@ export class SignsAndSymptomsController {
     @CurrentUser() user: AuthUser,
   ) {
     return this.signsService.update(id, dto, user);
+  }
+
+  @Post(':id/observations')
+  @Roles(Rol.NURSE)
+  @ApiOperation({
+    summary:
+      'Agregar una observación al registro (cualquier enfermero, en cualquier momento; no se editan ni se borran)',
+  })
+  @ApiParam(idParam)
+  @ApiCreatedResponse({
+    description: 'Registro con la observación agregada',
+    type: SignAndSymptom,
+  })
+  @ApiBadRequestResponse({ description: 'Datos inválidos' })
+  @ApiNotFoundResponse({ description: 'El registro no existe' })
+  addObservation(
+    @Param('id') id: string,
+    @Body() dto: AddObservationDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.signsService.addObservation(id, dto, user);
   }
 
   @Delete(':id')

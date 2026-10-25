@@ -50,6 +50,15 @@ export class Appointment {
   @Prop({ required: true })
   assigned_by_id: string;
 
+  @ApiProperty({
+    example: false,
+    description:
+      'Sobreturno: turno extra en un horario que ya tiene otro. Solo lo carga el administrador',
+  })
+  @Field()
+  @Prop({ type: Boolean, default: false })
+  is_overbooking: boolean;
+
   @ApiPropertyOptional({ example: '2026-10-23T22:05:46.429Z' })
   createdAt?: Date;
 
@@ -58,3 +67,25 @@ export class Appointment {
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);
+
+// Un solo turno activo por fecha y hora; los cancelados no ocupan el horario y los
+// sobreturnos (is_overbooking: true) quedan fuera del índice a propósito.
+// (Mongo no admite $ne en un filtro parcial, por eso se listan los estados activos
+// y se pide is_overbooking: false; los turnos viejos sin el campo no entran al índice,
+// pero el chequeo del servicio los sigue cubriendo.)
+AppointmentSchema.index(
+  { date: 1, hour: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      is_overbooking: false,
+      status: {
+        $in: [
+          AppointmentStatus.PENDING,
+          AppointmentStatus.CONFIRMED,
+          AppointmentStatus.COMPLETED,
+        ],
+      },
+    },
+  },
+);

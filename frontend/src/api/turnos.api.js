@@ -2,6 +2,19 @@ import { USE_MOCKS_TURNOS as USE_MOCKS } from '../config';
 import { apiTurnos } from './http';
 import { turnos, esperar, nuevoId } from '../mocks/datos';
 
+const MENSAJE_HORARIO_OCUPADO = 'Ya hay un turno reservado en esa fecha y hora';
+
+// Igual que el back: un horario admite un solo turno no cancelado, de cualquier paciente
+function horarioOcupado(date, hour, excluirId) {
+  return turnos.some(
+    (t) =>
+      t._id !== excluirId &&
+      t.date === date &&
+      t.hour === hour &&
+      t.status !== 'cancelled',
+  );
+}
+
 export async function obtenerTurnosPorPaciente(patientId) {
   if (USE_MOCKS) {
     await esperar();
@@ -13,10 +26,38 @@ export async function obtenerTurnosPorPaciente(patientId) {
   return data;
 }
 
+// Horas ya reservadas en una fecha ("YYYY-MM-DD"). Lo puede pedir cualquier rol:
+// el paciente solo ve sus turnos, así que no alcanza con listarlos.
+export async function obtenerHorariosOcupados(fecha) {
+  if (USE_MOCKS) {
+    await esperar();
+    return turnos
+      .filter((t) => t.date === fecha && t.status !== 'cancelled')
+      .map((t) => t.hour)
+      .sort();
+  }
+  const { data } = await apiTurnos.get('/appointments/availability', {
+    params: { date: fecha },
+  });
+  return data;
+}
+
 export async function crearTurno(datos) {
   if (USE_MOCKS) {
     await esperar();
-    const nuevo = { _id: nuevoId('t'), status: 'pending', ...datos };
+    if (
+      datos.status !== 'cancelled' &&
+      !datos.is_overbooking &&
+      horarioOcupado(datos.date, datos.hour)
+    ) {
+      throw new Error(MENSAJE_HORARIO_OCUPADO);
+    }
+    const nuevo = {
+      _id: nuevoId('t'),
+      status: 'pending',
+      is_overbooking: false,
+      ...datos,
+    };
     turnos.push(nuevo);
     return nuevo;
   }
@@ -42,6 +83,19 @@ export async function actualizarTurno(id, cambios) {
     await esperar();
     const turno = turnos.find((t) => t._id === id);
     if (!turno) throw new Error('Turno no encontrado');
+    const final = { ...turno, ...cambios };
+    const reservaHorario =
+      final.status !== 'cancelled' &&
+      (final.date !== turno.date ||
+        final.hour !== turno.hour ||
+        turno.status === 'cancelled');
+    if (
+      reservaHorario &&
+      !final.is_overbooking &&
+      horarioOcupado(final.date, final.hour, id)
+    ) {
+      throw new Error(MENSAJE_HORARIO_OCUPADO);
+    }
     Object.assign(turno, cambios);
     return { ...turno };
   }

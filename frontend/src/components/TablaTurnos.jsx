@@ -22,7 +22,12 @@ export default function TablaTurnos({ turnos, acciones, pacientes }) {
             <tr key={t._id}>
               {pacientes && <td>{pacientes[t.patient_id] || 'Desconocido'}</td>}
               <td>{formatearFecha(t.date)}</td>
-              <td>{t.hour}</td>
+              <td>
+                {t.hour}
+                {t.is_overbooking && (
+                  <span className="estado estado-sobreturno"> Sobreturno</span>
+                )}
+              </td>
               <td>{t.motive}</td>
               <td>
                 <span className={`estado estado-${t.status}`}>

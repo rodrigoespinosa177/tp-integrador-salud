@@ -1,6 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsNotEmpty,
@@ -45,6 +46,16 @@ export class UpdateAppointmentDto {
   @IsString()
   @IsNotEmpty()
   motive?: string;
+
+  @ApiPropertyOptional({
+    example: true,
+    description:
+      'Marca o desmarca el turno como sobreturno. Solo el administrador',
+  })
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  is_overbooking?: boolean;
 
   @ApiPropertyOptional({ enum: AppointmentStatus, example: 'cancelled' })
   @Field(() => AppointmentStatus, { nullable: true })

@@ -32,6 +32,7 @@ import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { Appointment } from './appointment.schema';
 import { AppointmentsService } from './appointments.service';
+import { AvailabilityQueryDto } from './dto/availability-query.dto';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
@@ -77,6 +78,25 @@ export class AppointmentsController {
     @Query('patient_id') patientId?: string,
   ) {
     return this.appointmentsService.findAll(user, patientId);
+  }
+
+  // Va antes de :id para que "availability" no se tome como un id
+  @Get('availability')
+  @ApiOperation({
+    summary: 'Horas ya reservadas en una fecha (cualquier usuario logueado)',
+  })
+  @ApiQuery({
+    name: 'date',
+    description: 'Fecha a consultar, formato YYYY-MM-DD',
+    example: '2026-10-28',
+  })
+  @ApiOkResponse({
+    description: 'Horas ocupadas, ordenadas',
+    schema: { type: 'array', items: { type: 'string', example: '09:30' } },
+  })
+  @ApiBadRequestResponse({ description: 'Fecha inválida' })
+  occupiedHours(@Query() query: AvailabilityQueryDto) {
+    return this.appointmentsService.occupiedHours(query.date);
   }
 
   @Get(':id')

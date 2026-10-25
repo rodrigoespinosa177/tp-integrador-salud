@@ -1,6 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsNotEmpty,
@@ -50,6 +51,16 @@ export class CreateAppointmentDto {
   @IsString()
   @IsNotEmpty()
   assigned_by_id?: string;
+
+  @ApiPropertyOptional({
+    default: false,
+    description:
+      'Sobreturno: permite reservar un horario que ya tiene otro turno. Solo el administrador',
+  })
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  is_overbooking?: boolean;
 
   @ApiPropertyOptional({ enum: AppointmentStatus, default: 'pending' })
   @Field(() => AppointmentStatus, { nullable: true })

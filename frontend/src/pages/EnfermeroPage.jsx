@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { obtenerTurnos } from '../api/turnos.api';
 import { obtenerUsuarios } from '../api/usuarios.api';
-import { obtenerSignosPorTurno, crearSignos } from '../api/signos.api';
+import {
+  obtenerSignosPorTurno,
+  crearSignos,
+  actualizarSignos,
+  agregarObservacion,
+} from '../api/signos.api';
+import { puedeEditarSigno } from '../utils/signos';
 import { formatearFecha } from '../utils/turnos';
 import TablaTurnos from '../components/TablaTurnos';
 import ListaSignos from '../components/ListaSignos';
@@ -17,6 +23,8 @@ export default function EnfermeroPage() {
   const [aviso, setAviso] = useState('');
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
   const [registros, setRegistros] = useState([]);
+  const [editando, setEditando] = useState(null); // registro que se está editando
+  const [observandoId, setObservandoId] = useState(null); // registro con la nota abierta
 
   // Pide turnos y pacientes a la vez. Si uno falla, el otro se muestra igual.
   useEffect(() => {
@@ -51,6 +59,8 @@ export default function EnfermeroPage() {
 
   async function abrirTurno(turno) {
     setTurnoSeleccionado(turno);
+    setEditando(null);
+    setObservandoId(null);
     setRegistros([]);
     try {
       setRegistros(await obtenerSignosPorTurno(turno._id));
@@ -74,6 +84,22 @@ export default function EnfermeroPage() {
       ),
     );
     setTurnoSeleccionado((prev) => ({ ...prev, status: 'completed' }));
+  }
+
+  async function handleAgregarObservacion(texto) {
+    const actualizado = await agregarObservacion(observandoId, texto, user._id);
+    setRegistros((prev) =>
+      prev.map((r) => (r._id === actualizado._id ? actualizado : r)),
+    );
+    setObservandoId(null);
+  }
+
+  async function handleActualizarSignos(datos) {
+    const actualizado = await actualizarSignos(editando._id, datos);
+    setRegistros((prev) =>
+      prev.map((r) => (r._id === actualizado._id ? actualizado : r)),
+    );
+    setEditando(null);
   }
 
   return (
@@ -103,8 +129,28 @@ export default function EnfermeroPage() {
           </h2>
           <p>Motivo: {turnoSeleccionado.motive}</p>
 
-          <ListaSignos registros={registros} />
-          <FormularioSignos onGuardar={handleGuardarSignos} />
+          <ListaSignos
+            registros={registros}
+            puedeEditar={(r) => puedeEditarSigno(r, user._id)}
+            onEditar={setEditando}
+            onAgregarObservacion={(r) => setObservandoId(r._id)}
+            observandoId={observandoId}
+            onGuardarObservacion={handleAgregarObservacion}
+            onCancelarObservacion={() => setObservandoId(null)}
+          />
+          {editando ? (
+            <FormularioSignos
+              key={editando._id}
+              inicial={editando}
+              onGuardar={handleActualizarSignos}
+              onCancelar={() => setEditando(null)}
+            />
+          ) : (
+            // Un turno se registra una sola vez
+            registros.length === 0 && (
+              <FormularioSignos onGuardar={handleGuardarSignos} />
+            )
+          )}
 
           <button
             className="secundario"

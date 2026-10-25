@@ -23,12 +23,41 @@ class FakeAppointmentModel {
   create(dto: Record<string, unknown>) {
     // Igual que Mongoose: un status undefined toma el valor por defecto
     const item = {
-      _id: String(this.items.length + 1),
+      // ObjectId válido (24 hex), como pide isValidObjectId en el servicio
+      _id: String(this.items.length + 1).padStart(24, '0'),
       ...dto,
       status: dto.status ?? 'pending',
     };
     this.items.push(item);
     return Promise.resolve(item);
+  }
+
+  exists(filter: { date: string; hour: string }) {
+    const ocupado = this.items.find(
+      (i) =>
+        i.date === filter.date &&
+        i.hour === filter.hour &&
+        i.status !== 'cancelled',
+    );
+    return Promise.resolve(ocupado ? { _id: ocupado._id } : null);
+  }
+
+  distinct(_campo: string, filter: { date: string }) {
+    const horas = this.items
+      .filter((i) => i.date === filter.date && i.status !== 'cancelled')
+      .map((i) => i.hour);
+    return { exec: () => Promise.resolve(horas) };
+  }
+
+  findById(id: string) {
+    const item = this.items.find((i) => i._id === id);
+    return { exec: () => Promise.resolve(item ?? null) };
+  }
+
+  findByIdAndUpdate(id: string, cambios: Record<string, unknown>) {
+    const item = this.items.find((i) => i._id === id);
+    if (item) Object.assign(item, cambios);
+    return { exec: () => Promise.resolve(item ?? null) };
   }
 
   find(filter: { patient_id?: string }) {
@@ -104,7 +133,7 @@ describe('Appointments (e2e)', () => {
     await request(app.getHttpServer())
       .post('/appointments')
       .set(como(OTRO_PACIENTE.token))
-      .send(body)
+      .send({ ...body, hour: '11:00' })
       .expect(201);
 
     await request(app.getHttpServer())
@@ -121,6 +150,150 @@ describe('Appointments (e2e)', () => {
       .set(como(PACIENTE.token))
       .query({ patient_id: OTRO_PACIENTE.id })
       .expect(403);
+  });
+
+  it('no deja reservar dos turnos en la misma fecha y hora (sobreturno)', async () => {
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(PACIENTE.token))
+      .send(body)
+      .expect(201);
+
+    // Mismo paciente, mismo horario
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(PACIENTE.token))
+      .send(body)
+      .expect(409);
+
+    // Otro paciente, mismo horario
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(OTRO_PACIENTE.token))
+      .send(body)
+      .expect(409);
+
+    // Otro horario: libre
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(OTRO_PACIENTE.token))
+      .send({ ...body, hour: '10:00' })
+      .expect(201);
+  });
+
+  describe('PATCH /appointments/:id como paciente', () => {
+    // Pasa por el ValidationPipe: el body llega como instancia del DTO
+    async function crearTurnoDe(token: string) {
+      const { body: creado } = await request(app.getHttpServer())
+        .post('/appointments')
+        .set(como(token))
+        .send(body)
+        .expect(201);
+      return creado._id as string;
+    }
+
+    it('puede cancelar su propio turno', async () => {
+      const id = await crearTurnoDe(PACIENTE.token);
+
+      await request(app.getHttpServer())
+        .patch(`/appointments/${id}`)
+        .set(como(PACIENTE.token))
+        .send({ status: 'cancelled' })
+        .expect(200)
+        .expect(({ body: turno }) => expect(turno.status).toBe('cancelled'));
+    });
+
+    it('no puede hacer otro cambio que cancelar', async () => {
+      const id = await crearTurnoDe(PACIENTE.token);
+
+      await request(app.getHttpServer())
+        .patch(`/appointments/${id}`)
+        .set(como(PACIENTE.token))
+        .send({ status: 'confirmed' })
+        .expect(403);
+      await request(app.getHttpServer())
+        .patch(`/appointments/${id}`)
+        .set(como(PACIENTE.token))
+        .send({ status: 'cancelled', motive: 'otro motivo' })
+        .expect(403);
+    });
+
+    it('no puede cancelar el turno de otro paciente', async () => {
+      const id = await crearTurnoDe(OTRO_PACIENTE.token);
+
+      await request(app.getHttpServer())
+        .patch(`/appointments/${id}`)
+        .set(como(PACIENTE.token))
+        .send({ status: 'cancelled' })
+        .expect(403);
+    });
+  });
+
+  it('GET /appointments/availability devuelve las horas ocupadas de la fecha a cualquier rol', async () => {
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(OTRO_PACIENTE.token))
+      .send({ ...body, hour: '11:00' })
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(OTRO_PACIENTE.token))
+      .send({ ...body, hour: '09:30' })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .get('/appointments/availability')
+      .set(como(PACIENTE.token))
+      .query({ date: body.date })
+      .expect(200)
+      .expect(['09:30', '11:00']);
+
+    await request(app.getHttpServer())
+      .get('/appointments/availability')
+      .set(como(PACIENTE.token))
+      .query({ date: '2026-11-02' })
+      .expect(200)
+      .expect([]);
+  });
+
+  it('GET /appointments/availability exige una fecha válida', () => {
+    return request(app.getHttpServer())
+      .get('/appointments/availability')
+      .set(como(PACIENTE.token))
+      .query({ date: 'mañana' })
+      .expect(400);
+  });
+
+  it('solo el administrador puede dar sobreturnos', async () => {
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(PACIENTE.token))
+      .send(body)
+      .expect(201);
+
+    // El paciente no puede forzar el horario ocupado
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(OTRO_PACIENTE.token))
+      .send({ ...body, is_overbooking: true })
+      .expect(403);
+
+    // Sin la marca, el administrador tampoco
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(ADMIN.token))
+      .send({ ...body, patient_id: OTRO_PACIENTE.id })
+      .expect(409);
+
+    // Con la marca, el administrador sí
+    await request(app.getHttpServer())
+      .post('/appointments')
+      .set(como(ADMIN.token))
+      .send({ ...body, patient_id: OTRO_PACIENTE.id, is_overbooking: true })
+      .expect(201)
+      .expect(({ body: creado }) => {
+        expect(creado.is_overbooking).toBe(true);
+      });
   });
 
   it('un paciente no puede sacar un turno a nombre de otro', () => {
