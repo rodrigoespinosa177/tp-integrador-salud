@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { Usuario, UsuarioDocument } from './schemas/usuario.schema';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { Rol } from './enums/rol.enum';
 
 @Injectable()
 export class UsuariosService {
@@ -49,11 +50,24 @@ export class UsuariosService {
   }
 
   async findAll(): Promise<UsuarioDocument[]> {
-    return this.usuarioModel.find({ is_active: true }).select('-password').exec();
+    return this.usuarioModel
+      .find({ is_active: true })
+      .select('-password')
+      .exec();
+  }
+
+  async findPacientes(): Promise<UsuarioDocument[]> {
+    return this.usuarioModel
+      .find({ rol: Rol.PATIENT, is_active: true })
+      .select('-password')
+      .exec();
   }
 
   async findById(id: string): Promise<UsuarioDocument> {
-    const usuario = await this.usuarioModel.findById(id).select('-password').exec();
+    const usuario = await this.usuarioModel
+      .findById(id)
+      .select('-password')
+      .exec();
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
@@ -65,17 +79,26 @@ export class UsuariosService {
   }
 
   async findByDni(dni: string): Promise<UsuarioDocument> {
-    const usuario = await this.usuarioModel.findOne({ dni }).select('-password').exec();
+    const usuario = await this.usuarioModel
+      .findOne({ dni })
+      .select('-password')
+      .exec();
     if (!usuario) {
       throw new NotFoundException(`No existe un usuario con DNI ${dni}`);
     }
     return usuario;
   }
 
-  async update(id: string, updateUsuarioDto: UpdateUsuarioDto): Promise<UsuarioDocument> {
+  async update(
+    id: string,
+    updateUsuarioDto: UpdateUsuarioDto,
+  ): Promise<UsuarioDocument> {
     if (updateUsuarioDto.password) {
       const salt = await bcrypt.genSalt(10);
-      updateUsuarioDto.password = await bcrypt.hash(updateUsuarioDto.password, salt);
+      updateUsuarioDto.password = await bcrypt.hash(
+        updateUsuarioDto.password,
+        salt,
+      );
     }
 
     let usuario: UsuarioDocument | null;
