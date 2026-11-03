@@ -120,6 +120,7 @@ export default function TurnosAdmin() {
         inicial={editando}
         listaPacientes={listaPacientes}
         permitirEstado
+        permitirSobreturno
         onGuardar={handleGuardar}
         onCancelar={editando ? () => setEditando(null) : undefined}
       />

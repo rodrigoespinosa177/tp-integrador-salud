@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { UsuariosModule } from './usuarios/usuarios.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    // Lee el archivo .env de forma global
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
-    // Conexión dinámica a MongoDB
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -17,6 +19,15 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [ConfigService],
     }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+      playground: true, // Habilita el sandbox/playground para pruebas
+      context: ({ req }: { req: unknown }) => ({ req }), // Los guards necesitan el request para leer el JWT
+    }),
+    UsuariosModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

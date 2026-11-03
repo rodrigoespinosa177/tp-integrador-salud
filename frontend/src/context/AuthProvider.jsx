@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AuthContext } from './AuthContext';
-import { login as loginApi } from '../api/auth.api';
+import { login as loginApi, registrar as registrarApi } from '../api/auth.api';
 import { RUTA_POR_ROL } from '../routes/rutasPorRol';
 
 function leerUsuarioGuardado() {
@@ -18,11 +18,19 @@ function leerUsuarioGuardado() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(leerUsuarioGuardado);
 
-  async function login(email, password) {
-    const data = await loginApi(email, password);
+  // Guarda token y usuario después de un login o un registro
+  function guardarSesion(data) {
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);
+  }
+
+  async function login(email, password) {
+    guardarSesion(await loginApi(email, password));
+  }
+
+  async function registrar(datos) {
+    guardarSesion(await registrarApi(datos));
   }
 
   function logout() {
@@ -31,14 +39,16 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout, actualizarSesion }}>
-      {children}
-    </AuthContext.Provider>
-  );
-
   function actualizarSesion(datosNuevos) {
     localStorage.setItem('user', JSON.stringify(datosNuevos));
     setUser(datosNuevos);
   }
+
+  return (
+    <AuthContext.Provider
+      value={{ user, login, registrar, logout, actualizarSesion }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }

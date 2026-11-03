@@ -1,6 +1,11 @@
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
+import { AppointmentsModule } from './appointments/appointments.module';
+import { SignsAndSymptomsModule } from './signs-and-symptoms/signs-and-symptoms.module';
 
 @Module({
   imports: [
@@ -18,9 +23,17 @@ import { MongooseModule } from '@nestjs/mongoose';
       inject: [ConfigService],
     }),
 
-    // Aquí tu compañero agregará sus módulos: TurnosModule, SignosSintomasModule
+    // 3. GraphQL code-first (esquema en memoria, endpoint /graphql)
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      // Los guards leen el usuario del JWT desde req
+      context: ({ req }: { req: unknown }) => ({ req }),
+    }),
+
+    AuthModule,
+    AppointmentsModule,
+    SignsAndSymptomsModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

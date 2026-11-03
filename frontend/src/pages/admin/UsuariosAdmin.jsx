@@ -4,7 +4,7 @@ import {
   obtenerUsuarios,
   crearUsuario,
   actualizarUsuario,
-  eliminarUsuario,
+  cambiarEstadoUsuario,
 } from '../../api/usuarios.api';
 import { ETIQUETA_ROL } from '../../utils/usuarios';
 import TablaUsuarios from '../../components/TablaUsuarios';
@@ -15,23 +15,35 @@ export default function UsuariosAdmin() {
   const [usuarios, setUsuarios] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const [filtroRol, setFiltroRol] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('active');
   const [editando, setEditando] = useState(null); // null = modo "crear"
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    obtenerUsuarios()
-      .then(setUsuarios)
-      .catch((err) => setError(err.message))
-      .finally(() => setCargando(false));
-  }, []);
+    let vigente = true;
+    obtenerUsuarios(undefined, filtroEstado)
+      .then((lista) => vigente && setUsuarios(lista))
+      .catch((err) => vigente && setError(err.message))
+      .finally(() => vigente && setCargando(false));
+    return () => {
+      vigente = false;
+    };
+  }, [filtroEstado]);
 
-  // Aplica búsqueda y filtro sobre la lista
+  function cambiarFiltroEstado(valor) {
+    setCargando(true);
+    setError('');
+    setFiltroEstado(valor);
+  }
+
+  // Aplica búsqueda (nombre, email o DNI) y filtro por rol
   const texto = busqueda.toLowerCase();
   const visibles = usuarios.filter((u) => {
     const coincideTexto =
       `${u.first_name} ${u.last_name}`.toLowerCase().includes(texto) ||
-      u.email.toLowerCase().includes(texto);
+      u.email.toLowerCase().includes(texto) ||
+      (u.dni || '').includes(texto);
     const coincideRol = !filtroRol || u.rol === filtroRol;
     return coincideTexto && coincideRol;
   });
@@ -49,16 +61,22 @@ export default function UsuariosAdmin() {
     }
   }
 
-  async function handleEliminar(u) {
+  async function handleCambiarEstado(u) {
     setError('');
-    if (u._id === user._id) {
-      setError('No podés eliminar tu propio usuario');
+    const activar = u.is_active === false;
+    if (!activar && u._id === user._id) {
+      setError('No podés desactivar tu propio usuario');
       return;
     }
-    if (!window.confirm(`¿Eliminar a ${u.first_name} ${u.last_name}?`)) return;
+    const accion = activar ? 'Activar' : 'Desactivar';
+    if (!window.confirm(`¿${accion} a ${u.first_name} ${u.last_name}?`)) return;
     try {
-      await eliminarUsuario(u._id);
-      setUsuarios((prev) => prev.filter((x) => x._id !== u._id));
+      const actualizado = await cambiarEstadoUsuario(u._id, activar);
+      setUsuarios((prev) =>
+        filtroEstado === 'all'
+          ? prev.map((x) => (x._id === u._id ? actualizado : x))
+          : prev.filter((x) => x._id !== u._id),
+      );
     } catch (err) {
       setError(err.message);
     }
@@ -71,7 +89,7 @@ export default function UsuariosAdmin() {
       <div className="filtros">
         <input
           type="search"
-          placeholder="Buscar por nombre o email"
+          placeholder="Buscar por nombre, email o DNI"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
@@ -85,6 +103,15 @@ export default function UsuariosAdmin() {
               {etiqueta}
             </option>
           ))}
+        </select>
+        <select
+          aria-label="Estado"
+          value={filtroEstado}
+          onChange={(e) => cambiarFiltroEstado(e.target.value)}
+        >
+          <option value="active">Activos</option>
+          <option value="inactive">Inactivos</option>
+          <option value="all">Todos</option>
         </select>
       </div>
 
@@ -100,8 +127,11 @@ export default function UsuariosAdmin() {
               <button className="secundario" onClick={() => setEditando(u)}>
                 Editar
               </button>
-              <button className="peligro" onClick={() => handleEliminar(u)}>
-                Eliminar
+              <button
+                className={u.is_active === false ? 'secundario' : 'peligro'}
+                onClick={() => handleCambiarEstado(u)}
+              >
+                {u.is_active === false ? 'Activar' : 'Desactivar'}
               </button>
             </>
           )}

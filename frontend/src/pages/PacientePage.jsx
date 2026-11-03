@@ -5,8 +5,10 @@ import {
   crearTurno,
   cancelarTurno,
 } from '../api/turnos.api';
+import { proximoTurno } from '../utils/turnos';
 import TablaTurnos from '../components/TablaTurnos';
 import FormularioTurno from '../components/FormularioTurno';
+import TurnoDestacado from '../components/TurnoDestacado';
 
 export default function PacientePage() {
   const { user } = useAuth();
@@ -41,28 +43,52 @@ export default function PacientePage() {
     }
   }
 
+  // El próximo turno va destacado; el resto abajo, de los más nuevos a los más viejos
+  const proximo = proximoTurno(turnos);
+  const historial = turnos
+    .filter((t) => t._id !== proximo?._id)
+    .sort((a, b) => `${b.date} ${b.hour}`.localeCompare(`${a.date} ${a.hour}`));
+
   return (
-    <section>
-      <h1>Mis turnos</h1>
+    <section className="pagina">
+      <header className="pagina-encabezado">
+        <h1>Hola, {user.first_name}</h1>
+        <p>Acá ves tus turnos y podés pedir uno nuevo.</p>
+      </header>
 
       {error && <p role="alert">{error}</p>}
 
       {cargando ? (
         <p>Cargando turnos...</p>
+      ) : proximo ? (
+        <TurnoDestacado turno={proximo} onCancelar={handleCancelar} />
       ) : (
-        <TablaTurnos
-          turnos={turnos}
-          acciones={(t) =>
-            (t.status === 'pending' || t.status === 'confirmed') && (
-              <button className="peligro" onClick={() => handleCancelar(t._id)}>
-                Cancelar
-              </button>
-            )
-          }
-        />
+        <div className="vacio">
+          <h2>No tenés turnos próximos</h2>
+          <p>Pedí uno con el formulario de abajo y lo vas a ver acá.</p>
+        </div>
       )}
 
       <FormularioTurno onGuardar={handleCrear} />
+
+      {!cargando && historial.length > 0 && (
+        <div className="bloque">
+          <h2>Tus otros turnos</h2>
+          <TablaTurnos
+            turnos={historial}
+            acciones={(t) =>
+              (t.status === 'pending' || t.status === 'confirmed') && (
+                <button
+                  className="peligro"
+                  onClick={() => handleCancelar(t._id)}
+                >
+                  Cancelar
+                </button>
+              )
+            }
+          />
+        </div>
+      )}
     </section>
   );
 }
